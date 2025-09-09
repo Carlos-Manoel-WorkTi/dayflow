@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Clock, Tag as TagIcon, Trash2, Lock } from "lucide-react";
+import { Edit, Trash2, Clock, Tag as TagIcon, Lock } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,9 +9,10 @@ import { useToast } from "@/hooks/use-toast";
 interface ActivityListProps {
   activities: Activity[];
   onDeleteActivity: (activityId: string) => void;
+  onEditActivity: (activityId: string, activity: Omit<Activity, 'id'>) => void;
 }
 
-export function ActivityList({ activities, onDeleteActivity }: ActivityListProps) {
+export function ActivityList({ activities, onDeleteActivity, onEditActivity }: ActivityListProps) {
   const { toast } = useToast();
 
   const handleDelete = (activityId: string, description: string) => {
@@ -116,14 +117,31 @@ export function ActivityList({ activities, onDeleteActivity }: ActivityListProps
                       </div>
                     </div>
                     
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => handleDelete(activity.id, activity.description)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-200">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implementar modal de edição
+                          console.log('Edit activity:', activity.id);
+                        }}
+                        className="h-8 w-8 p-0 hover:bg-primary/10"
+                      >
+                        <Edit className="h-4 w-4 text-primary" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDelete(activity.id, activity.description);
+                        }}
+                        className="h-8 w-8 p-0 hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>

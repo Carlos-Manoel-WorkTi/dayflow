@@ -14,10 +14,11 @@ interface ActivityFormProps {
   onAddActivity: (activity: Omit<Activity, 'id'>) => void;
   availableTags: Tag[];
   onCreateTag: (tagName: string) => void;
+  nextStartTime: string;
 }
 
-export function ActivityForm({ onAddActivity, availableTags, onCreateTag }: ActivityFormProps) {
-  const [startTime, setStartTime] = useState("");
+export function ActivityForm({ onAddActivity, availableTags, onCreateTag, nextStartTime }: ActivityFormProps) {
+  const [startTime, setStartTime] = useState(nextStartTime);
   const [endTime, setEndTime] = useState("");
   const [description, setDescription] = useState("");
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
@@ -54,7 +55,7 @@ export function ActivityForm({ onAddActivity, availableTags, onCreateTag }: Acti
     });
 
     // Reset form
-    setStartTime("");
+    setStartTime(nextStartTime);
     setEndTime("");
     setDescription("");
     setSelectedTags([]);

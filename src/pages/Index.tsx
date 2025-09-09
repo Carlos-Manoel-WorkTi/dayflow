@@ -18,9 +18,11 @@ const Index = () => {
     commitmentData,
     createNewDay,
     addActivity,
+    editActivity,
     removeActivity,
     createTag,
     completeDay,
+    getNextStartTime,
   } = useDayFlow();
 
   const { toast } = useToast();
@@ -113,6 +115,23 @@ const Index = () => {
             <CommitmentChart data={commitmentData} />
           </div>
 
+          {/* Botão de Insights da IA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-8 text-center"
+          >
+            <Button 
+              variant="gradient" 
+              size="lg"
+              className="shadow-elegant hover:shadow-glow"
+            >
+              <Sparkles className="w-5 h-5 mr-2" />
+              Gerar Insights da IA
+            </Button>
+          </motion.div>
+
           {/* Seção Principal */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             
@@ -167,6 +186,7 @@ const Index = () => {
                       onAddActivity={addActivity}
                       availableTags={availableTags}
                       onCreateTag={createTag}
+                      nextStartTime={getNextStartTime()}
                     />
                   )}
                 </motion.div>
@@ -179,6 +199,7 @@ const Index = () => {
                 <ActivityList
                   activities={currentDay.activities}
                   onDeleteActivity={removeActivity}
+                  onEditActivity={editActivity}
                 />
               )}
             </div>

@@ -74,6 +74,20 @@ export function useDayFlow() {
     return newDay;
   };
 
+  // Obter próximo horário de início sugerido
+  const getNextStartTime = () => {
+    if (!currentDay || currentDay.activities.length === 0) {
+      return "00:00";
+    }
+    
+    const sortedActivities = [...currentDay.activities].sort((a, b) => 
+      a.startTime.localeCompare(b.startTime)
+    );
+    
+    const lastActivity = sortedActivities[sortedActivities.length - 1];
+    return lastActivity.endTime;
+  };
+
   // Adicionar atividade
   const addActivity = (activityData: Omit<Activity, 'id'>) => {
     if (!currentDay) return;
@@ -86,6 +100,24 @@ export function useDayFlow() {
     const updatedDay = {
       ...currentDay,
       activities: [...currentDay.activities, newActivity],
+      updatedAt: new Date().toISOString(),
+    };
+
+    setCurrentDay(updatedDay);
+    setDayProcesses(prev => 
+      prev.map(p => p.id === updatedDay.id ? updatedDay : p)
+    );
+  };
+
+  // Editar atividade
+  const editActivity = (activityId: string, activityData: Omit<Activity, 'id'>) => {
+    if (!currentDay) return;
+
+    const updatedDay = {
+      ...currentDay,
+      activities: currentDay.activities.map(a => 
+        a.id === activityId ? { ...activityData, id: activityId } : a
+      ),
       updatedAt: new Date().toISOString(),
     };
 
@@ -182,9 +214,11 @@ export function useDayFlow() {
     hasActiveDay: !!currentDay,
     createNewDay,
     addActivity,
+    editActivity,
     removeActivity,
     createTag,
     completeDay,
+    getNextStartTime,
     commitmentData: getCommitmentData(),
   };
 }
