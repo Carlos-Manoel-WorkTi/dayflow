@@ -1,46 +1,30 @@
 import { motion } from "framer-motion";
-import { Sparkles, Save, CheckCircle } from "lucide-react";
+import { Sparkles, Save, Plus, Calendar, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { CreateDayButton } from "@/components/DayProcess/CreateDayButton";
-import { ActivityForm } from "@/components/DayProcess/ActivityForm";
-import { ActivityList } from "@/components/DayProcess/ActivityList";
+import { Badge } from "@/components/ui/badge";
 import { CommitmentChart } from "@/components/Charts/CommitmentChart";
+import { Navigation } from "@/components/Navigation";
 import { useDayFlow } from "@/hooks/useDayFlow";
-import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
 
 const Index = () => {
   const {
-    currentDay,
-    hasActiveDay,
+    dayProcesses,
     availableTags,
     commitmentData,
-    createNewDay,
-    addActivity,
-    editActivity,
-    removeActivity,
-    createTag,
-    completeDay,
-    getNextStartTime,
   } = useDayFlow();
 
-  const { toast } = useToast();
+  // Filtrar apenas dias finalizados
+  const completedDays = dayProcesses.filter(day => day.isCompleted);
 
-  const handleCompleteDay = () => {
-    if (!currentDay || currentDay.activities.length === 0) {
-      toast({
-        title: "Nenhuma atividade registrada",
-        description: "Adicione pelo menos uma atividade antes de finalizar o dia.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    completeDay();
-    toast({
-      title: "Dia finalizado com sucesso!",
-      description: "Seu nível de compromisso foi calculado e salvo.",
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
     });
   };
 
@@ -85,23 +69,25 @@ const Index = () => {
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight">DayFlow</h1>
             </div>
             <p className="text-xl md:text-2xl text-white/90 mb-3 font-medium">
-              Organize sua rotina, analise seus padrões
+              Histórico e Análise de Rotina
             </p>
             <p className="text-white/80 text-lg mb-8">
-              {getTodayDate()}
+              Visualize seus dados e padrões de compromisso
             </p>
             
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="flex justify-center"
+              className="flex justify-center gap-4"
             >
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                <p className="text-white/90 text-sm">
-                  ✨ Sistema inteligente para análise de rotina diária
-                </p>
-              </div>
+              <Navigation />
+              <Link to="/day-process">
+                <Button variant="hero" size="lg">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Novo Processo
+                </Button>
+              </Link>
             </motion.div>
           </motion.div>
         </div>
@@ -132,78 +118,112 @@ const Index = () => {
             </Button>
           </motion.div>
 
-          {/* Seção Principal */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            
-            {/* Criar/Gerenciar Dia */}
-            <div className="space-y-6">
-              {!hasActiveDay ? (
-                <CreateDayButton 
-                  onCreateDay={createNewDay}
-                  hasActiveDay={hasActiveDay}
-                />
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-4"
-                >
-                  <Card className="border-2 border-primary/20 gradient-card">
-                    <CardContent className="p-6">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <h2 className="text-xl font-bold text-primary mb-1">
-                            Processo do Dia Ativo
-                          </h2>
-                          <p className="text-muted-foreground">
-                            {currentDay?.activities.length || 0} atividades registradas
-                          </p>
-                        </div>
-                        
-                        {currentDay && !currentDay.isCompleted && (
-                          <Button 
-                            onClick={handleCompleteDay}
-                            variant="success"
-                            className="flex items-center gap-2"
-                          >
-                            <CheckCircle className="w-4 h-4" />
-                            Finalizar Dia
-                          </Button>
-                        )}
-                        
-                        {currentDay?.isCompleted && (
-                          <div className="flex items-center gap-2 text-success">
-                            <CheckCircle className="w-5 h-5" />
-                            <span className="font-medium">Dia Finalizado</span>
+          {/* Histórico de Dias Finalizados */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="mb-8"
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold flex items-center gap-2">
+                <Calendar className="w-6 h-6 text-primary" />
+                Histórico de Atividades
+              </h2>
+              <Badge variant="secondary" className="text-sm">
+                {completedDays.length} dias finalizados
+              </Badge>
+            </div>
+
+            {completedDays.length === 0 ? (
+              <Card className="border-2 border-dashed border-muted-foreground/30">
+                <CardContent className="p-12 text-center">
+                  <TrendingUp className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <h3 className="text-lg font-medium mb-2 text-muted-foreground">
+                    Nenhum dia finalizado ainda
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    Complete seu primeiro processo do dia para ver o histórico aqui.
+                  </p>
+                  <Link to="/day-process">
+                    <Button>
+                      <Plus className="w-4 h-4 mr-2" />
+                      Iniciar Primeiro Dia
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            ) : (
+              <div className="grid gap-4">
+                {completedDays
+                  .sort((a, b) => b.date.localeCompare(a.date))
+                  .map((day) => (
+                    <motion.div
+                      key={day.id}
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="group"
+                    >
+                      <Card className="hover:shadow-md transition-all duration-200 border border-primary/10">
+                        <CardContent className="p-6">
+                          <div className="flex items-center justify-between mb-4">
+                            <div>
+                              <h3 className="font-semibold text-lg">
+                                {formatDate(day.date)}
+                              </h3>
+                              <p className="text-sm text-muted-foreground">
+                                {day.activities.length} atividades • Nível de compromisso: {day.commitmentLevel || 0}/10
+                              </p>
+                            </div>
+                            <Badge 
+                              variant="secondary"
+                              className="bg-success/10 text-success border-success/20"
+                            >
+                              Finalizado
+                            </Badge>
                           </div>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
 
-                  {!currentDay?.isCompleted && (
-                    <ActivityForm
-                      onAddActivity={addActivity}
-                      availableTags={availableTags}
-                      onCreateTag={createTag}
-                      nextStartTime={getNextStartTime()}
-                    />
-                  )}
-                </motion.div>
-              )}
-            </div>
-
-            {/* Lista de Atividades */}
-            <div>
-              {hasActiveDay && currentDay && (
-                <ActivityList
-                  activities={currentDay.activities}
-                  onDeleteActivity={removeActivity}
-                  onEditActivity={editActivity}
-                />
-              )}
-            </div>
-          </div>
+                          <div className="grid gap-3">
+                            {day.activities
+                              .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                              .map((activity) => (
+                                <div
+                                  key={activity.id}
+                                  className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <div className="text-sm font-mono text-muted-foreground">
+                                      {activity.startTime} - {activity.endTime}
+                                    </div>
+                                    <div className="flex-1">
+                                      <p className="text-sm font-medium">{activity.description}</p>
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    {activity.tags.map((tag) => (
+                                      <Badge
+                                        key={tag.id}
+                                        variant="outline"
+                                        className="text-xs"
+                                        style={{
+                                          borderColor: tag.color + "40",
+                                          color: tag.color,
+                                        }}
+                                      >
+                                        {tag.name}
+                                      </Badge>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </motion.div>
+                  ))}
+              </div>
+            )}
+          </motion.div>
 
           {/* Status do Sistema */}
           <motion.div
