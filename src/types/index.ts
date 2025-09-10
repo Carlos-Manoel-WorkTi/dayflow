@@ -20,6 +20,7 @@ export interface DayProcess {
   activities: Activity[];
   commitmentLevel?: number;
   isCompleted: boolean;
+  finalizado: boolean;
   createdAt: string;
   updatedAt: string;
 }

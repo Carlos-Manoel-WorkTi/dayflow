@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
+import { db } from "../config/firebase";
+import { collection, doc, setDoc, getDoc, getDocs } from "firebase/firestore";
 import { Activity, Tag, DayProcess, CommitmentData } from "@/types";
-
-// Mock data e funções utilitárias
+import { loginTestUser } from "../config/firebase";
+import { deleteDoc } from "firebase/firestore";
+// Gerar IDs aleatórios
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
+// Tags padrão
 const defaultTags: Tag[] = [
   { id: "1", name: "Trabalho", color: "#8B5CF6" },
   { id: "2", name: "Estudo", color: "#06B6D4" },
@@ -11,6 +15,10 @@ const defaultTags: Tag[] = [
   { id: "4", name: "Lazer", color: "#F59E0B" },
   { id: "5", name: "Família", color: "#EF4444" },
   { id: "6", name: "Saúde", color: "#EC4899" },
+  { id: "7", name: "Financeiro", color: "#FBBF24" },
+  { id: "8", name: "Projetos", color: "#3B82F6" },
+  { id: "9", name: "Compras", color: "#6366F1" },
+  { id: "10", name: "Tarefas Domésticas", color: "#22C55E" },
 ];
 
 export function useDayFlow() {
@@ -18,43 +26,61 @@ export function useDayFlow() {
   const [availableTags, setAvailableTags] = useState<Tag[]>(defaultTags);
   const [currentDay, setCurrentDay] = useState<DayProcess | null>(null);
 
-  // Carrega dados do localStorage
-  useEffect(() => {
-    const savedProcesses = localStorage.getItem("dayflow-processes");
-    const savedTags = localStorage.getItem("dayflow-tags");
-    
-    if (savedProcesses) {
-      setDayProcesses(JSON.parse(savedProcesses));
-    }
-    
-    if (savedTags) {
-      setAvailableTags(JSON.parse(savedTags));
-    }
+  const daysCol = collection(db, "dias");
+  const tagsDoc = doc(db, "meta", "tags");
 
-    // Verifica se existe um processo para hoje
-    const today = new Date().toISOString().split('T')[0];
-    const processes = savedProcesses ? JSON.parse(savedProcesses) : [];
-    const todayProcess = processes.find((p: DayProcess) => p.date === today);
-    
-    if (todayProcess) {
-      setCurrentDay(todayProcess);
+  // Carregar dados do Firestore
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        await loginTestUser();
+
+        // Carregar tags
+        const tagsSnap = await getDoc(tagsDoc);
+        if (tagsSnap.exists()) {
+          const data = tagsSnap.data();
+          if (data.tags && Array.isArray(data.tags)) setAvailableTags(data.tags);
+        }
+
+        // Carregar dias
+        const snapshot = await getDocs(daysCol);
+        const dias: DayProcess[] = snapshot.docs.map(d => d.data() as DayProcess);
+        setDayProcesses(dias);
+
+        // Selecionar o último dia não finalizado ou o último dia criado
+        const lastDay = dias
+          .sort((a, b) => b.date.localeCompare(a.date))
+          .find(d => !d.finalizado) || dias[dias.length - 1];
+
+        if (lastDay) setCurrentDay(lastDay);
+      } catch (err) {
+        console.error("Erro ao carregar dados do Firestore:", err);
+      }
     }
+    fetchData();
   }, []);
 
-  // Salva dados no localStorage
-  useEffect(() => {
-    localStorage.setItem("dayflow-processes", JSON.stringify(dayProcesses));
-  }, [dayProcesses]);
+  // Salvar tags
+  const saveTags = async (tags: Tag[]) => {
+    setAvailableTags(tags);
+    await setDoc(tagsDoc, { tags });
+  };
 
-  useEffect(() => {
-    localStorage.setItem("dayflow-tags", JSON.stringify(availableTags));
-  }, [availableTags]);
+  // Salvar ou atualizar dia
+  const saveDay = async (day: DayProcess) => {
+    setCurrentDay(day);
+    setDayProcesses(prev =>
+      prev.some(d => d.id === day.id)
+        ? prev.map(d => (d.id === day.id ? day : d))
+        : [...prev, day]
+    );
+    await setDoc(doc(daysCol, day.date), day);
+  };
 
-  // Criar novo dia
-  const createNewDay = () => {
-    const today = new Date().toISOString().split('T')[0];
-    const existingDay = dayProcesses.find(p => p.date === today);
-    
+  // Criar novo dia (data opcional)
+  const createNewDay = async (date?: string) => {
+    const dayDate = date || new Date().toISOString().split("T")[0];
+    const existingDay = dayProcesses.find(p => p.date === dayDate);
     if (existingDay) {
       setCurrentDay(existingDay);
       return existingDay;
@@ -62,163 +88,144 @@ export function useDayFlow() {
 
     const newDay: DayProcess = {
       id: generateId(),
-      date: today,
+      date: dayDate,
       activities: [],
       isCompleted: false,
+      finalizado: false, // Novo campo
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
 
-    setDayProcesses(prev => [...prev, newDay]);
-    setCurrentDay(newDay);
+    await saveDay(newDay);
     return newDay;
   };
 
-  // Obter próximo horário de início sugerido
-  const getNextStartTime = () => {
-    if (!currentDay || currentDay.activities.length === 0) {
-      return "00:00";
-    }
-    
-    const sortedActivities = [...currentDay.activities].sort((a, b) => 
-      a.startTime.localeCompare(b.startTime)
-    );
-    
-    const lastActivity = sortedActivities[sortedActivities.length - 1];
-    return lastActivity.endTime;
-  };
-
   // Adicionar atividade
-  const addActivity = (activityData: Omit<Activity, 'id'>) => {
+  const addActivity = async (activityData: Omit<Activity, "id">) => {
     if (!currentDay) return;
-
-    const newActivity: Activity = {
-      ...activityData,
-      id: generateId(),
-    };
-
-    const updatedDay = {
+    const newActivity: Activity = { ...activityData, id: generateId() };
+    const updatedDay: DayProcess = {
       ...currentDay,
       activities: [...currentDay.activities, newActivity],
       updatedAt: new Date().toISOString(),
     };
-
-    setCurrentDay(updatedDay);
-    setDayProcesses(prev => 
-      prev.map(p => p.id === updatedDay.id ? updatedDay : p)
-    );
+    await saveDay(updatedDay);
   };
 
   // Editar atividade
-  const editActivity = (activityId: string, activityData: Omit<Activity, 'id'>) => {
-    if (!currentDay) return;
+const editActivity = async (
+  activityId: string,
+  activityData: Omit<Activity, "id">,
+  dayId?: string
+) => {
+  const targetDay = dayId
+    ? dayProcesses.find(d => d.id === dayId)
+    : currentDay;
 
-    const updatedDay = {
-      ...currentDay,
-      activities: currentDay.activities.map(a => 
-        a.id === activityId ? { ...activityData, id: activityId } : a
-      ),
-      updatedAt: new Date().toISOString(),
-    };
+  if (!targetDay) return;
 
-    setCurrentDay(updatedDay);
-    setDayProcesses(prev => 
-      prev.map(p => p.id === updatedDay.id ? updatedDay : p)
-    );
+  const updatedDay: DayProcess = {
+    ...targetDay,
+    activities: targetDay.activities.map(a =>
+      a.id === activityId ? { ...activityData, id: activityId } : a
+    ),
+    updatedAt: new Date().toISOString(),
   };
+  await saveDay(updatedDay);
+};
 
-  // Remover atividade
-  const removeActivity = (activityId: string) => {
-    if (!currentDay) return;
+// Remover atividade (aceita dayId opcional)
+const removeActivity = async (activityId: string, dayId?: string) => {
+  const targetDay = dayId
+    ? dayProcesses.find(d => d.id === dayId)
+    : currentDay;
 
-    const updatedDay = {
-      ...currentDay,
-      activities: currentDay.activities.filter(a => a.id !== activityId),
-      updatedAt: new Date().toISOString(),
-    };
+  if (!targetDay) return;
 
-    setCurrentDay(updatedDay);
-    setDayProcesses(prev => 
-      prev.map(p => p.id === updatedDay.id ? updatedDay : p)
-    );
+  const updatedActivities = targetDay.activities.filter(a => a.id !== activityId);
+
+  if (updatedActivities.length === 0) {
+    // Remove o documento do dia do Firestore
+    await deleteDoc(doc(daysCol, targetDay.date));
+    setDayProcesses(prev => prev.filter(d => d.id !== targetDay.id));
+    if (currentDay?.id === targetDay.id) setCurrentDay(null);
+    return;
+  }
+
+  const updatedDay: DayProcess = {
+    ...targetDay,
+    activities: updatedActivities,
+    updatedAt: new Date().toISOString(),
   };
-
-  // Criar nova tag
-  const createTag = (name: string) => {
+  await saveDay(updatedDay);
+};
+  // Criar tag
+  const createTag = async (name: string): Promise<Tag> => {
     const colors = ["#8B5CF6", "#06B6D4", "#10B981", "#F59E0B", "#EF4444", "#EC4899", "#6366F1", "#8B5A2B"];
-    const newTag: Tag = {
-      id: generateId(),
-      name,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    };
-
-    setAvailableTags(prev => [...prev, newTag]);
+    const newTag: Tag = { id: generateId(), name, color: colors[Math.floor(Math.random() * colors.length)] };
+    const updatedTags = [...availableTags, newTag];
+    await saveTags(updatedTags);
     return newTag;
   };
 
-  // Finalizar dia (calcular nível de compromisso)
-  const completeDay = () => {
-    if (!currentDay) return;
+  // Próximo horário de início
+  const getNextStartTime = () => {
+    if (!currentDay || currentDay.activities.length === 0) return "00:00";
+    const sorted = [...currentDay.activities].sort((a, b) => a.startTime.localeCompare(b.startTime));
+    return sorted[sorted.length - 1].endTime;
+  };
 
-    // Algoritmo simples para calcular compromisso baseado em:
-    // - Número de atividades
-    // - Duração total das atividades
-    // - Variedade de tags
+  // Finalizar dia
+  const completeDay = async () => {
+    if (!currentDay || currentDay.activities.length === 0) return;
+
     const activities = currentDay.activities;
-    const activitiesCount = activities.length;
     const uniqueTags = new Set(activities.flatMap(a => a.tags.map(t => t.id))).size;
-    
-    // Calcula duração total em minutos
-    const totalDuration = activities.reduce((total, activity) => {
-      const start = new Date(`2023-01-01 ${activity.startTime}`);
-      const end = new Date(`2023-01-01 ${activity.endTime}`);
+    const totalDuration = activities.reduce((total, a) => {
+      const start = new Date(`2023-01-01 ${a.startTime}`);
+      const end = new Date(`2023-01-01 ${a.endTime}`);
       return total + (end.getTime() - start.getTime()) / (1000 * 60);
     }, 0);
 
-    // Fórmula simples: normalize para escala 1-10
-    const commitmentLevel = Math.min(10, Math.max(1, 
-      (activitiesCount * 1.5) + 
-      (uniqueTags * 0.8) + 
-      (totalDuration / 60) * 0.5
-    ));
+    const commitmentLevel = Math.min(
+      10,
+      Math.max(1, activities.length * 1.5 + uniqueTags * 0.8 + (totalDuration / 60) * 0.5)
+    );
 
-    const updatedDay = {
+    const updatedDay: DayProcess = {
       ...currentDay,
       commitmentLevel: Math.round(commitmentLevel * 10) / 10,
       isCompleted: true,
+      finalizado: true, // Marca como finalizado
       updatedAt: new Date().toISOString(),
     };
 
-    setCurrentDay(updatedDay);
-    setDayProcesses(prev => 
-      prev.map(p => p.id === updatedDay.id ? updatedDay : p)
-    );
+    await saveDay(updatedDay);
   };
 
-  // Dados do gráfico de compromisso
-  const getCommitmentData = (): CommitmentData[] => {
-    return dayProcesses
-      .filter(p => p.commitmentLevel !== undefined)
-      .map(p => ({
-        date: p.date,
-        level: p.commitmentLevel!,
-        activitiesCount: p.activities.length,
+  // Dados para gráfico
+  const getCommitmentData = (): CommitmentData[] =>
+    dayProcesses
+      .filter(d => d.commitmentLevel !== undefined)
+      .map(d => ({
+        date: d.date,
+        level: d.commitmentLevel!,
+        activitiesCount: d.activities.length,
       }))
       .sort((a, b) => a.date.localeCompare(b.date));
-  };
 
   return {
     currentDay,
     dayProcesses,
     availableTags,
-    hasActiveDay: !!currentDay,
+    hasActiveDay: currentDay !== null && !currentDay.finalizado,
     createNewDay,
     addActivity,
     editActivity,
     removeActivity,
     createTag,
-    completeDay,
     getNextStartTime,
+    completeDay,
     commitmentData: getCommitmentData(),
   };
 }

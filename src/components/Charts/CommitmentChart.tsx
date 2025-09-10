@@ -20,7 +20,7 @@ const chartConfig = {
   },
 };
 
-export function CommitmentChart({ data }: CommitmentChartProps) {
+export function CommitmentChart({ data = [] }: { data?: CommitmentData[] }) {
   const averageCommitment = data.length > 0 
     ? data.reduce((sum, item) => sum + item.level, 0) / data.length 
     : 0;

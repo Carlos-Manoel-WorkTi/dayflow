@@ -8,17 +8,24 @@ import { Navigation } from "@/components/Navigation";
 import { useDayFlow } from "@/hooks/useDayFlow";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
+import { useNavigate } from "react-router-dom";
+
 
 const Index = () => {
-  const {
-    dayProcesses,
-    availableTags,
-    commitmentData,
-  } = useDayFlow();
+const {
+  dayProcesses,
+  availableTags,
+  commitmentData,
+  createNewDay,
+  hasActiveDay
+} = useDayFlow();
+
+const navigate = useNavigate();
 
   // Filtrar apenas dias finalizados
   const completedDays = dayProcesses.filter(day => day.isCompleted);
-
+  const activeDay = dayProcesses.find(day => !day.isCompleted);
+  const pendingActivities = activeDay?.activities || [];
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       weekday: 'long',
@@ -81,13 +88,8 @@ const Index = () => {
               transition={{ delay: 0.3 }}
               className="flex justify-center gap-4"
             >
-              <Navigation />
-              <Link to="/day-process">
-                <Button variant="hero" size="lg">
-                  <Plus className="w-5 h-5 mr-2" />
-                  Novo Processo
-                </Button>
-              </Link>
+               <Navigation onCreateDay={createNewDay} hasActiveDay={hasActiveDay} />
+              
             </motion.div>
           </motion.div>
         </div>
@@ -95,7 +97,69 @@ const Index = () => {
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
-          
+{pendingActivities.length > 0 && (
+  <motion.div
+    initial={{ opacity: 0, y: -20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3 }}
+    className="mb-6 cursor-pointer"
+    onClick={() => navigate("/day-process")}
+  >
+    <Card className="border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 transition-all duration-200">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="font-semibold text-lg text-blue-700">Atividades Pendentes</h3>
+            <p className="text-sm text-blue-600">
+              Última atualização: {activeDay?.updatedAt ? new Date(activeDay.updatedAt).toLocaleTimeString('pt-BR') : '-'}
+            </p>
+          </div>
+          <Badge
+            variant="secondary"
+            className="bg-blue-100 text-blue-800 border-blue-200"
+          >
+            Pendente
+          </Badge>
+        </div>
+
+        <div className="grid gap-3">
+          {pendingActivities.map((activity) => (
+            <div
+              key={activity.id}
+              className="flex items-center justify-between p-3 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors duration-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="text-sm font-mono text-blue-700">
+                  {activity.startTime} - {activity.endTime}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{activity.description}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1">
+                {activity.tags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    variant="outline"
+                    className="text-xs"
+                    style={{
+                      borderColor: tag.color + "40",
+                      color: tag.color,
+                    }}
+                  >
+                    {tag.name}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  </motion.div>
+)}
+
+
           {/* Gráfico de Compromisso */}
           <div className="mb-8">
             <CommitmentChart data={commitmentData} />

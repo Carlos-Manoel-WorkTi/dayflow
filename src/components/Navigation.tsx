@@ -1,38 +1,67 @@
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, Calendar, Sparkles } from "lucide-react";
+import { Calendar, CheckCircle, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-export function Navigation() {
-  const location = useLocation();
+interface NavigationProps {
+  onCreateDay: () => void;
+  hasActiveDay: boolean;
+}
 
-  const navItems = [
-    { path: "/", label: "Histórico", icon: Home },
-    { path: "/day-process", label: "Processo do Dia", icon: Calendar },
-  ];
+export function Navigation({ onCreateDay, hasActiveDay }: NavigationProps) {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleNewDay = () => {
+    if (typeof onCreateDay === "function") {
+      if (!hasActiveDay) {
+        onCreateDay();
+      }
+      navigate("/day-process");
+    } else {
+      console.error("onCreateDay não foi passado para Navigation!");
+    }
+  };
+
+  const isDayProcess = location.pathname === "/day-process";
+  const isCompletedDays = location.pathname === "/completed-days";
 
   return (
     <nav className="flex items-center gap-2">
-      {navItems.map((item) => {
-        const Icon = item.icon;
-        const isActive = location.pathname === item.path;
-        
-        return (
-          <Link key={item.path} to={item.path}>
-            <Button
-              variant={isActive ? "default" : "ghost"}
-              size="sm"
-              className={cn(
-                "flex items-center gap-2",
-                isActive && "bg-primary text-primary-foreground"
-              )}
-            >
-              <Icon className="w-4 h-4" />
-              {item.label}
-            </Button>
-          </Link>
-        );
-      })}
+      {/* Processo do Dia */}
+      <Button
+        asChild
+        variant={isDayProcess ? "default" : "ghost"}
+        size="sm"
+        className="flex items-center gap-2"
+      >
+        <a href="/day-process">
+          <Calendar className="w-4 h-4" />
+          Processo do Dia
+        </a>
+      </Button>
+
+      {/* Criar ou Continuar Dia */}
+      <Button
+        onClick={handleNewDay}
+        variant={hasActiveDay ? "default" : "hero"}
+        size="sm"
+        className="flex items-center gap-2"
+      >
+        <Plus className="w-4 h-4" />
+        {hasActiveDay ? "Continuar Dia" : "Novo Dia"}
+      </Button>
+
+      {/* Dias Finalizados */}
+      <Button
+        onClick={() => navigate("/completed-days")}
+        variant={isCompletedDays ? "default" : "ghost"}
+        size="sm"
+        className="flex items-center gap-2"
+      >
+        <CheckCircle className="w-4 h-4" />
+        Dias Finalizados
+      </Button>
     </nav>
   );
 }

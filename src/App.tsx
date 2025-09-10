@@ -6,10 +6,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import DayProcess from "./pages/DayProcess";
 import NotFound from "./pages/NotFound";
+import CompletedDays from "./pages/CompletedDays";
 
 const queryClient = new QueryClient();
 
 const App = () => (
+  
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
@@ -18,6 +20,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/day-process" element={<DayProcess />} />
+           <Route path="/completed-days" element={<CompletedDays />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
