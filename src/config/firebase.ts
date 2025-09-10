@@ -1,30 +1,29 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyBKm-sknL7FjPzjfde7eYSXuvSJ-OwZzcg",
-  authDomain: "dayflow-32453.firebaseapp.com",
-  projectId: "dayflow-32453",
-  storageBucket: "dayflow-32453.firebasestorage.app",
-  messagingSenderId: "428121632392",
-  appId: "1:428121632392:web:e7e563c85e0dfff463793d",
-  measurementId: "G-RJRYHN1PPX"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
+// Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+
 export const auth = getAuth(app);
+export const db = getFirestore(app);
 
 export const loginTestUser = async () => {
-  await signInWithEmailAndPassword(auth, "carlosprogramacao6@gmail.com", "carlos");
+  await signInWithEmailAndPassword(
+    auth,
+    import.meta.env.VITE_TEST_USER_EMAIL!,
+    import.meta.env.VITE_TEST_USER_PASSWORD!
+  );
 };
-// Exporta Firestore
-export const db = getFirestore(app);
