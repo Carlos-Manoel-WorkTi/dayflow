@@ -44,3 +44,13 @@ export interface UserContextType {
   hasProfile: boolean;
   getAvatar: () => string; // retorna foto ou inicial
 }
+
+export interface GeminiResponse {
+  text: string;
+  raw: any;
+}
+
+export interface SystemInstruction {
+  system: string;  // exemplo: "analisar rotinas", "gerar insights"
+  prompt: string;  // texto ou descrição a enviar
+}

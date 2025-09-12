@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
 import { useNavigate } from "react-router-dom";
 import { NavBar } from "@/components/SideBar/NavBar";
+import { InsightsButton } from "@/components/InsightsButton";
 
 
 const Index = () => {
@@ -168,7 +169,7 @@ const navigate = useNavigate();
           </div>
 
           {/* Botão de Insights da IA */}
-          <motion.div
+          {/* <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4 }}
@@ -182,7 +183,9 @@ const navigate = useNavigate();
               <Sparkles className="w-5 h-5 mr-2" />
               Gerar Insights da IA
             </Button>
-          </motion.div>
+          </motion.div> */}
+          <InsightsButton dia="2025-09-12" />
+
 
           {/* Histórico de Dias Finalizados */}
           <motion.div
