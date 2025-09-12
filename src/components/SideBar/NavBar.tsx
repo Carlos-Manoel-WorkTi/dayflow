@@ -12,9 +12,12 @@ import {
   PieChart,
   BrainCircuit,
   CalendarDays,
+  Menu,
+  X,
 } from "lucide-react";
 import { useUser } from "@/contexts/UserContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
 import logoImg from "@/assets/logo.png";
 
 export const menuItems = [
@@ -32,6 +35,10 @@ export const menuItems = [
 
 export function NavBar({ open, setOpen }) {
   const { user, getAvatar, clearUser } = useUser();
+  const [mobileMenu, setMobileMenu] = useState(false);
+  const location = useLocation();
+
+  const isHome = location.pathname === "/";
 
   return (
     <>
@@ -120,25 +127,21 @@ export function NavBar({ open, setOpen }) {
         {open ? (
           <SkipBack size={18} className="text-[rgb(156,91,255)]" />
         ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="white"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="lucide lucide-skip-forward"
-          >
-            <path d="M21 4v16" />
-            <path d="M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z" />
-          </svg>
+          <Menu size={18} className="text-[rgb(156,91,255)]" />
         )}
       </motion.button>
 
-      {/* Bottom Nav Mobile */}
+      {/* Botão menu Mobile (só aparece na Home) */}
+      {isHome && (
+        <button
+          onClick={() => setMobileMenu(true)}
+          className="md:hidden fixed top-4 left-4 z-50 p-2 rounded-lg bg-white shadow-md border"
+        >
+          <Menu className="w-6 h-6 text-gray-700" />
+        </button>
+      )}
+
+      {/* Bottom Nav Mobile (atalhos principais) */}
       <nav className="fixed bottom-0 left-0 w-full bg-white border-t shadow-md flex justify-around items-center py-2 md:hidden z-40">
         {menuItems.slice(0, 5).map((item) => (
           <Link
@@ -151,6 +154,48 @@ export function NavBar({ open, setOpen }) {
           </Link>
         ))}
       </nav>
+
+      {/* Drawer Mobile (só abre se estiver na Home) */}
+      {isHome && mobileMenu && (
+        <motion.div
+          initial={{ x: "-100%" }}
+          animate={{ x: 0 }}
+          exit={{ x: "-100%" }}
+          transition={{ type: "spring", stiffness: 100, damping: 20 }}
+          className="fixed inset-0 bg-black/40 z-50 flex"
+          onClick={() => setMobileMenu(false)}
+        >
+          <motion.div
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            className="w-64 h-full bg-white shadow-lg p-4 flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center border-b pb-3 mb-3">
+              <img src={logoImg} alt="Logo" className="w-8 h-8" />
+              <button onClick={() => setMobileMenu(false)}>
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+
+            <nav className="flex-1 overflow-y-auto custom-scrollbar">
+              {menuItems.map((item) => (
+                <Link
+                  key={item.label}
+                  to={item.path}
+                  onClick={() => setMobileMenu(false)}
+                  className="flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 hover:bg-primary/10 hover:text-primary transition"
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </motion.div>
+        </motion.div>
+      )}
     </>
   );
 }

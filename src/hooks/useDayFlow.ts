@@ -4,6 +4,7 @@ import { collection, doc, setDoc, getDoc, getDocs } from "firebase/firestore";
 import { Activity, Tag, DayProcess, CommitmentData } from "@/types";
 import { loginTestUser } from "../config/firebase";
 import { deleteDoc } from "firebase/firestore";
+import { getLocalDate } from "@/lib/utils";
 // Gerar IDs aleatórios
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
@@ -78,27 +79,29 @@ export function useDayFlow() {
   };
 
   // Criar novo dia (data opcional)
-  const createNewDay = async (date?: string) => {
-    const dayDate = date || new Date().toISOString().split("T")[0];
-    const existingDay = dayProcesses.find(p => p.date === dayDate);
-    if (existingDay) {
-      setCurrentDay(existingDay);
-      return existingDay;
-    }
+const createNewDay = async (date?: string): Promise<{ day: DayProcess; existed: boolean }> => {
+  const dayDate = date || new Date().toISOString().split("T")[0];
+  const existingDay = dayProcesses.find(p => p.date === dayDate);
 
-    const newDay: DayProcess = {
-      id: generateId(),
-      date: dayDate,
-      activities: [],
-      isCompleted: false,
-      finalizado: false, // Novo campo
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+  if (existingDay) {
+    setCurrentDay(existingDay);
+    return { day: existingDay, existed: true };
+  }
 
-    await saveDay(newDay);
-    return newDay;
+  const newDay: DayProcess = {
+    id: generateId(),
+    date: dayDate,
+    activities: [],
+    isCompleted: false,
+    finalizado: false,
+    createdAt: getLocalDate(),
+    updatedAt: getLocalDate(),
   };
+
+  await saveDay(newDay);
+  return { day: newDay, existed: false };
+};
+
 
   // Adicionar atividade
   const addActivity = async (activityData: Omit<Activity, "id">) => {
@@ -227,5 +230,6 @@ const removeActivity = async (activityId: string, dayId?: string) => {
     getNextStartTime,
     completeDay,
     commitmentData: getCommitmentData(),
+    saveDay,
   };
 }

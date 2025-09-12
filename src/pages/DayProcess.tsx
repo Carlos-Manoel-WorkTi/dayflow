@@ -10,10 +10,15 @@ import { useToast } from "@/hooks/use-toast";
 import { Link, useNavigate } from "react-router-dom";
 import Loader from "@/components/loader/Loading";
 import DateModal from "@/components/DayProcess/DateModal";
+import { ConfirmReopenModal } from "@/components/DayProcess/ConfirmReopenModal";
+import { getTodayDate } from "@/lib/utils";
+
 
 const DayProcess = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const [showReopenModal, setShowReopenModal] = useState(false);
+  const [dayToReopen, setDayToReopen] = useState<DayProcess | null>(null);
 
   const {
     currentDay,
@@ -26,6 +31,8 @@ const DayProcess = () => {
     createTag,
     completeDay,
     getNextStartTime,
+    saveDay,
+    
   } = useDayFlow();
 
   // Loading de criação de novo dia
@@ -41,13 +48,7 @@ const DayProcess = () => {
     }
   }, [hasActiveDay, currentDay]);
 
-  const getTodayDate = () =>
-    new Date().toLocaleDateString("pt-BR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+
 
   const handleCompleteDay = () => {
     if (!currentDay || currentDay.activities.length === 0) {
@@ -69,14 +70,21 @@ const DayProcess = () => {
     navigate("/");
   };
 
+
   const handleCreateNewDay = async (manualDate?: string) => {
     setLoadingNewDay(true);
     try {
-      const day = await createNewDay(manualDate);
-      toast({
-        title: "Novo dia criado!",
-        description: `Dia ${day.date} iniciado.`,
-      });
+      const { day, existed } = await createNewDay(manualDate);
+
+      if (existed && day.finalizado) {
+        setDayToReopen(day);
+        setShowReopenModal(true);
+      } else {
+        toast({
+          title: "Novo dia criado!",
+          description: `Dia ${day.date} iniciado.`,
+        });
+      }
     } catch (error) {
       console.error(error);
       toast({
@@ -90,7 +98,6 @@ const DayProcess = () => {
   };
 
 
-
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -99,21 +106,36 @@ const DayProcess = () => {
         animate={{ opacity: 1, y: 0 }}
         className="bg-card border-b sticky top-0 z-50 backdrop-blur-sm"
       >
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="container mx-auto px-4 py-3 flex items-center justify-between">
+          {/* Esquerda: voltar + título */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Botão voltar */}
             <Link to="/">
-              <Button variant="ghost" size="sm">
-                <ArrowLeft className="w-4 h-4 mr-2" />Voltar
+              <Button variant="ghost" size="icon" className="sm:size-sm">
+                <ArrowLeft className="w-5 h-5" />
+                <span className="hidden sm:inline ml-2">Voltar</span>
               </Button>
             </Link>
+
+            {/* Título */}
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
-              <h1 className="text-xl font-bold">Processo do Dia</h1>
+              <h1 className="text-lg sm:text-xl font-bold">Processo do Dia</h1>
             </div>
           </div>
-          <p className="text-sm text-muted-foreground">{getTodayDate()}</p>
+
+          {/* Data visível só em telas grandes */}
+          <p className="hidden sm:block text-sm text-muted-foreground">
+            {getTodayDate()}
+          </p>
         </div>
       </motion.header>
+
+      {/* Data visível só em telas pequenas */}
+      <div className="sm:hidden text-center py-2 text-sm text-muted-foreground">
+        {getTodayDate()}
+      </div>
+
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
@@ -198,6 +220,21 @@ const DayProcess = () => {
           setShowDateModal(false);
         }}
       />
+      <ConfirmReopenModal
+        isOpen={showReopenModal}
+        onClose={() => setShowReopenModal(false)}
+        onConfirm={async () => {
+          if (!dayToReopen) return;
+          const reopenedDay = { ...dayToReopen, finalizado: false, isCompleted: false };
+          await saveDay(reopenedDay); // use a mesma função que já salva no Firestore
+          setShowReopenModal(false);
+          toast({
+            title: "Dia reaberto!",
+            description: `O processo de ${dayToReopen.date} foi reativado.`,
+          });
+        }}
+      />
+
     </div>
   );
 };
