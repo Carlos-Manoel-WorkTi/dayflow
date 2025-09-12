@@ -30,3 +30,17 @@ export interface CommitmentData {
   level: number;
   activitiesCount: number;
 }
+
+export interface User {
+  name: string;
+  email: string;
+  photo?: string; // opcional
+}
+
+export interface UserContextType {
+  user: User | null;
+  setUser: (user: User) => void;
+  clearUser: () => void;
+  hasProfile: boolean;
+  getAvatar: () => string; // retorna foto ou inicial
+}

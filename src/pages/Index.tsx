@@ -9,6 +9,7 @@ import { useDayFlow } from "@/hooks/useDayFlow";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
 import { useNavigate } from "react-router-dom";
+import { NavBar } from "@/components/SideBar/NavBar";
 
 
 const Index = () => {
@@ -46,6 +47,7 @@ const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-background">
+   
       {/* Hero Header */}
       <motion.header
         initial={{ opacity: 0, y: -20 }}
