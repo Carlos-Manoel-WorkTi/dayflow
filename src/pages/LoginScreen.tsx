@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { LogIn } from "lucide-react"; // Lucide icon
+import { Button } from "@/components/ui/button";
 
 interface LoginScreenProps {
   onLogin: (user: { name: string; email: string; photo?: string }) => void;
+  onGoogleLogin: () => void;
 }
 
-export function LoginScreen({ onLogin }: LoginScreenProps) {
+export function LoginScreen({ onLogin, onGoogleLogin }: LoginScreenProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -51,6 +54,18 @@ export function LoginScreen({ onLogin }: LoginScreenProps) {
           className="w-full p-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold shadow-lg"
         >
           Entrar
+        </motion.button>
+
+        {/* Botão de login com Google usando Lucide */}
+        <motion.button
+          type="button"
+          onClick={onGoogleLogin}
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          className="w-full p-3 rounded-xl border border-gray-300 flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md transition"
+        >
+          <LogIn className="w-5 h-5 text-red-500" />
+          Entrar com Google
         </motion.button>
 
         <p className="text-sm text-center text-gray-500 mt-2">
