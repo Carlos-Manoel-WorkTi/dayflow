@@ -9,7 +9,6 @@ import { useDayFlow } from "@/hooks/useDayFlow";
 import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
 import { useNavigate } from "react-router-dom";
-import { NavBar } from "@/components/SideBar/NavBar";
 import { InsightsButton } from "@/components/InsightsButton";
 
 
@@ -184,7 +183,7 @@ const navigate = useNavigate();
               Gerar Insights da IA
             </Button>
           </motion.div> */}
-          <InsightsButton dia="2025-09-12" />
+          <InsightsButton atividades={activeDay?.activities || []} />
 
 
           {/* Histórico de Dias Finalizados */}
