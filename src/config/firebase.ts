@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -16,6 +16,7 @@ const firebaseConfig = {
 // Inicializa Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const googleProvider = new GoogleAuthProvider();
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -26,4 +27,19 @@ export const loginTestUser = async () => {
     import.meta.env.VITE_TEST_USER_EMAIL!,
     import.meta.env.VITE_TEST_USER_PASSWORD!
   );
+};
+
+export const signInWithGoogle = async () => {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const user = result.user;
+    return {
+      name: user.displayName || "",
+      email: user.email || "",
+      photo: user.photoURL || "",
+    };
+  } catch (error) {
+    console.error("Erro no login com Google:", error);
+    throw error;
+  }
 };

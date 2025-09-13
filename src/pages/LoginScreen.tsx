@@ -1,21 +1,21 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LogIn } from "lucide-react"; // Lucide icon
+import { LogIn, LogInIcon } from "lucide-react"; // ícone do Google
 import { Button } from "@/components/ui/button";
 
 interface LoginScreenProps {
-  onLogin: (user: { name: string; email: string; photo?: string }) => void;
+  onEmailLogin: (email: string, name: string) => void;
   onGoogleLogin: () => void;
 }
 
-export function LoginScreen({ onLogin, onGoogleLogin }: LoginScreenProps) {
+export function LoginScreen({ onEmailLogin, onGoogleLogin }: LoginScreenProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email) return;
-    onLogin({ name, email });
+    onEmailLogin(email, name);
   };
 
   return (
@@ -53,24 +53,20 @@ export function LoginScreen({ onLogin, onGoogleLogin }: LoginScreenProps) {
           whileTap={{ scale: 0.95 }}
           className="w-full p-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold shadow-lg"
         >
-          Entrar
+          <LogIn className="inline w-5 h-5 mr-2" /> Entrar com Email
         </motion.button>
 
-        {/* Botão de login com Google usando Lucide */}
+        <div className="text-center text-gray-400 mt-2">ou</div>
+
         <motion.button
           type="button"
           onClick={onGoogleLogin}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          className="w-full p-3 rounded-xl border border-gray-300 flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md transition"
+          className="w-full p-3 rounded-xl border border-gray-300 flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md transition mt-2"
         >
-          <LogIn className="w-5 h-5 text-red-500" />
-          Entrar com Google
+          <LogInIcon className="w-5 h-5 text-red-500" /> Entrar com Google
         </motion.button>
-
-        <p className="text-sm text-center text-gray-500 mt-2">
-          Organize seu dia e aumente sua produtividade ✨
-        </p>
       </motion.form>
     </div>
   );

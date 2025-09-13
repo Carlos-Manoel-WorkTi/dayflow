@@ -27,6 +27,15 @@ const navigate = useNavigate();
   const completedDays = dayProcesses.filter(day => day.isCompleted);
   const activeDay = dayProcesses.find(day => !day.isCompleted);
   const pendingActivities = activeDay?.activities || [];
+  // Pega os últimos 5 dias finalizados ou ativos
+  const lastDays = dayProcesses
+    .sort((a, b) => b.date.localeCompare(a.date)) // do mais recente pro mais antigo
+    .slice(0, 5); // pega no máximo 5 dias
+
+  // Junta todas as atividades desses dias
+  const atividadesParaInsights = lastDays.flatMap(day => day.activities);
+  console.log("atividadesParaInsights:", atividadesParaInsights);
+  
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
       weekday: 'long',
@@ -35,15 +44,9 @@ const navigate = useNavigate();
       day: 'numeric'
     });
   };
+console.log("dayProcesses:", dayProcesses);
 
-  const getTodayDate = () => {
-    return new Date().toLocaleDateString('pt-BR', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -168,23 +171,11 @@ const navigate = useNavigate();
           </div>
 
           {/* Botão de Insights da IA */}
-          {/* <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mb-8 text-center"
-          >
-            <Button 
-              variant="gradient" 
-              size="lg"
-              className="shadow-elegant hover:shadow-glow"
-            >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Gerar Insights da IA
-            </Button>
-          </motion.div> */}
-          <InsightsButton atividades={activeDay?.activities || []} />
 
+        <InsightsButton atividades={atividadesParaInsights} />
+
+
+          
 
           {/* Histórico de Dias Finalizados */}
           <motion.div

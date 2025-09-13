@@ -30,7 +30,7 @@ export function Navigation({ onCreateDay, hasActiveDay }: NavigationProps) {
     <nav className="flex items-center gap-2">
       {/* Processo do Dia */}
       <Button
-        asChild
+        asChild 
         variant={isDayProcess ? "default" : "ghost"}
         size="sm"
         className="flex items-center gap-2"
