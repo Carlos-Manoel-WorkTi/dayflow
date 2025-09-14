@@ -54,3 +54,10 @@ export interface SystemInstruction {
   system: string;  // exemplo: "analisar rotinas", "gerar insights"
   prompt: string;  // texto ou descrição a enviar
 }
+
+
+// components/AgendEvents/types.ts
+export interface CalendarEvent {
+  date: string; // formato "yyyy-MM-dd"
+  activitiesCount: number;
+}

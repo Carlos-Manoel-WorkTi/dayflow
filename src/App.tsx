@@ -11,6 +11,12 @@ import CompletedDays from "./pages/CompletedDays";
 import { UserProvider } from "./contexts/UserContext";
 import { MainLayout } from "./layout/MainLayout";
 import EditDayProcess from "./pages/EditDayProcess";
+import {AgendaPage} from "./pages/Agenda";
+import { ReportsPage } from "./pages/ReportsPage";
+import { NotificationsPage } from "./pages/NotificationsPage";
+import { InsightsPage } from "./pages/InsightsPage";
+import { SettingsPage } from "./pages/SettingsPage";
+import { ProfilePage } from "./pages/ProfilePage";
 
 
 const queryClient = new QueryClient();
@@ -28,6 +34,12 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/day-process" element={<DayProcess />} />
               <Route path="/edit-day/:id" element={<EditDayProcess />} />
+              <Route path="/agenda" element={<AgendaPage />} />
+              <Route path="/reports" element={<ReportsPage />} />
+              <Route path="/profile" element={<ProfilePage/>} />
+               <Route path="/settings" element={<SettingsPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
+              <Route path="/insights" element={<InsightsPage />} />
               <Route path="/completed-days" element={<CompletedDays />} />
               <Route path="*" element={<NotFound />} />
             </Route>

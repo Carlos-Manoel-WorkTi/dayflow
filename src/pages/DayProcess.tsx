@@ -18,7 +18,7 @@ const DayProcess = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showReopenModal, setShowReopenModal] = useState(false);
-  const [dayToReopen, setDayToReopen] = useState<DayProcess | null>(null);
+  const [dayToReopen, setDayToReopen] = useState<typeof DayProcess | null>(null);
 
   const {
     currentDay,

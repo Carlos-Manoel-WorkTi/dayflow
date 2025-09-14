@@ -81,7 +81,7 @@ const EditDayProcess = () => {
       </motion.header>
 
       {/* Conteúdo */}
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 pb-24 md:pb-6">
         <div className="max-w-4xl mx-auto">
           <Card className="border-2 border-primary/20 gradient-card">
             <CardContent className="p-6 flex items-center justify-between">

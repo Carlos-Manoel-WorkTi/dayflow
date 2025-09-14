@@ -41,7 +41,7 @@ const CompletedDays = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-background container mx-auto px-4 py-8 pb-24 md:pb-6">
       {/* Header */}
       <motion.div
         className="flex items-center justify-between mb-8"
