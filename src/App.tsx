@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import CompletedDays from "./pages/CompletedDays";
 import { UserProvider } from "./contexts/UserContext";
 import { MainLayout } from "./layout/MainLayout";
+import EditDayProcess from "./pages/EditDayProcess";
 
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
               <Route path="/day-process" element={<DayProcess />} />
+              <Route path="/edit-day/:id" element={<EditDayProcess />} />
               <Route path="/completed-days" element={<CompletedDays />} />
               <Route path="*" element={<NotFound />} />
             </Route>

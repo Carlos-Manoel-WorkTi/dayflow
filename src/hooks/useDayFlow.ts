@@ -229,6 +229,28 @@ export function useDayFlow() {
     await saveDay(updatedDay);
   };
 
+  // Apagar dia
+  // Remover um dia inteiro
+  const removeDay = async (dayId: string) => {
+    const targetDay = dayProcesses.find((d) => d.id === dayId);
+    if (!targetDay) return;
+
+    try {
+      // Deleta o documento do Firestore
+      await deleteDoc(doc(getDaysCol(), targetDay.date));
+
+      // Atualiza o estado local
+      setDayProcesses((prev) => prev.filter((d) => d.id !== dayId));
+
+      // Se for o dia atual, limpa currentDay
+      if (currentDay?.id === dayId) setCurrentDay(null);
+
+      console.log(`Dia ${targetDay.date} removido com sucesso`);
+    } catch (err) {
+      console.error("Erro ao remover dia:", err);
+    }
+  };
+
   // Dados p/ gráfico
   const getCommitmentData = (): CommitmentData[] =>
     dayProcesses
@@ -252,6 +274,7 @@ export function useDayFlow() {
     createTag,
     getNextStartTime,
     completeDay,
+    removeDay,
     commitmentData: getCommitmentData(),
     saveDay,
   };
