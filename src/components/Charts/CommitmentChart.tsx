@@ -2,27 +2,16 @@ import { motion } from "framer-motion";
 import { TrendingUp, Calendar, Award } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, ResponsiveContainer, AreaChart, Area } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { CommitmentData } from "@/types";
 
 interface CommitmentChartProps {
   data: CommitmentData[];
 }
 
-const chartConfig = {
-  level: {
-    label: "Nível de Compromisso",
-    color: "hsl(var(--primary))",
-  },
-  activitiesCount: {
-    label: "Número de Atividades",
-    color: "hsl(var(--info))",
-  },
-};
-
 export function CommitmentChart({ data = [] }: { data?: CommitmentData[] }) {
-  const averageCommitment = data.length > 0 
-    ? data.reduce((sum, item) => sum + item.level, 0) / data.length 
+  const averageCommitment = data.length > 0
+    ? data.reduce((sum, item) => sum + item.level, 0) / data.length
     : 0;
 
   const totalActivities = data.reduce((sum, item) => sum + item.activitiesCount, 0);
@@ -35,95 +24,78 @@ export function CommitmentChart({ data = [] }: { data?: CommitmentData[] }) {
     >
       <Card className="border-2 border-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary" />
+          <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             Gráfico de Compromisso
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs sm:text-sm">
             Acompanhe sua evolução diária e padrões de produtividade
           </CardDescription>
         </CardHeader>
+
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="text-center p-4 rounded-lg gradient-secondary"
-            >
-              <Award className="w-6 h-6 text-primary mx-auto mb-2" />
-              <div className="text-2xl font-bold text-primary">
-                {averageCommitment.toFixed(1)}
-              </div>
-              <div className="text-sm text-muted-foreground">Compromisso Médio</div>
+          {/* Cards de métricas em linha */}
+          <div className="flex justify-between gap-2 mb-6">
+            <motion.div whileHover={{ scale: 1.02 }} className="flex-1 text-center p-2 sm:p-4 rounded-lg gradient-secondary">
+              <Award className="w-4 h-4 sm:w-6 sm:h-6 text-primary mx-auto mb-1 sm:mb-2" />
+              <div className="text-lg sm:text-2xl font-bold text-primary">{averageCommitment.toFixed(1)}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Compromisso Médio</div>
             </motion.div>
 
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="text-center p-4 rounded-lg gradient-secondary"
-            >
-              <Calendar className="w-6 h-6 text-info mx-auto mb-2" />
-              <div className="text-2xl font-bold text-info">
-                {data.length}
-              </div>
-              <div className="text-sm text-muted-foreground">Dias Registrados</div>
+            <motion.div whileHover={{ scale: 1.02 }} className="flex-1 text-center p-2 sm:p-4 rounded-lg gradient-secondary">
+              <Calendar className="w-4 h-4 sm:w-6 sm:h-6 text-info mx-auto mb-1 sm:mb-2" />
+              <div className="text-lg sm:text-2xl font-bold text-info">{data.length}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Dias Registrados</div>
             </motion.div>
 
-            <motion.div
-              whileHover={{ scale: 1.02 }}
-              className="text-center p-4 rounded-lg gradient-secondary"
-            >
-              <TrendingUp className="w-6 h-6 text-success mx-auto mb-2" />
-              <div className="text-2xl font-bold text-success">
-                {totalActivities}
-              </div>
-              <div className="text-sm text-muted-foreground">Total de Atividades</div>
+            <motion.div whileHover={{ scale: 1.02 }} className="flex-1 text-center p-2 sm:p-4 rounded-lg gradient-secondary">
+              <TrendingUp className="w-4 h-4 sm:w-6 sm:h-6 text-success mx-auto mb-1 sm:mb-2" />
+              <div className="text-lg sm:text-2xl font-bold text-success">{totalActivities}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Total de Atividades</div>
             </motion.div>
           </div>
 
+          {/* Gráfico */}
           {data.length > 0 ? (
-            <ChartContainer config={chartConfig}>
-              <ResponsiveContainer width="100%" height={300}>
-                <AreaChart data={data}>
+            <ChartContainer config={{ level: { label: "Nível de Compromisso", color: "hsl(var(--primary))" } }}>
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={data} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="commitmentGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                     </linearGradient>
                   </defs>
                   <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                  <XAxis 
-                    dataKey="date" 
-                    tick={{ fontSize: 12 }}
-                    tickFormatter={(value) => new Date(value).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}
-                  />
-                  <YAxis 
-                    domain={[0, 10]} 
-                    tick={{ fontSize: 12 }}
-                  />
-                  <ChartTooltip 
-                    content={<ChartTooltipContent />}
-                    labelFormatter={(value) => 
-                      new Date(value).toLocaleDateString('pt-BR', { 
-                        weekday: 'long',
-                        day: '2-digit', 
-                        month: 'long' 
-                      })
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10 }}
+                    tickFormatter={(value) =>
+                      new Date(value).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" })
                     }
                   />
-                  <Area 
-                    type="monotone" 
-                    dataKey="level" 
+                  <YAxis domain={[0, 10]} tick={{ fontSize: 10 }} />
+                  <ChartTooltip
+                    content={<ChartTooltipContent />}
+                    labelFormatter={(value) =>
+                      new Date(value).toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "short" })
+                    }
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="level"
                     stroke="hsl(var(--primary))"
-                    strokeWidth={3}
+                    strokeWidth={2}
                     fill="url(#commitmentGradient)"
                   />
                 </AreaChart>
               </ResponsiveContainer>
             </ChartContainer>
           ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <Calendar className="w-12 h-12 mx-auto mb-4 opacity-50" />
-              <h3 className="text-lg font-semibold mb-2">Ainda não há dados suficientes</h3>
-              <p>Registre mais dias para ver seu gráfico de compromisso!</p>
+            <div className="text-center py-8 sm:py-12 text-muted-foreground">
+              <Calendar className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-4 opacity-50" />
+              <h3 className="text-sm sm:text-lg font-semibold mb-1 sm:mb-2">Ainda não há dados suficientes</h3>
+              <p className="text-xs sm:text-sm">Registre mais dias para ver seu gráfico de compromisso!</p>
             </div>
           )}
         </CardContent>

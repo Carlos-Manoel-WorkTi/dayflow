@@ -3,16 +3,16 @@ import { motion } from "framer-motion";
 import { Calendar, Edit, Trash2, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { useDayFlow } from "@/hooks/useDayFlow";
 import Loader from "@/components/loader/Loading";
 import { useNavigate } from "react-router-dom";
+import { CompletedDayCard } from "@/components/DayProcess/CompletedDayCard";
 
 const CompletedDays = () => {
   const navigate = useNavigate();
   const { dayProcesses, removeDay } = useDayFlow();
   const [loading, setLoading] = useState(true);
-  const [confirmDayId, setConfirmDayId] = useState<string | null>(null); // Dia a confirmar exclusão
+  const [confirmDayId, setConfirmDayId] = useState<string | null>(null);
 
   useEffect(() => {
     if (dayProcesses) {
@@ -84,134 +84,62 @@ const CompletedDays = () => {
             <div className="grid gap-4">
               {completedDays
                 .sort((a, b) => b.date.localeCompare(a.date))
-                .map((day) => {
-                  const tooMany = day.activities.length > 4;
+                .map((day) => (
+                  <div key={day.id} className="relative">
+                    <CompletedDayCard day={day} formatDate={formatDate} />
 
-                  return (
-                    <Card key={day.id} className="border border-primary/10 relative">
-                      <CardContent className="p-6">
-                        {/* Cabeçalho */}
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="space-y-1">
-                            <h3 className="font-semibold text-lg">
-                              {formatDate(day.date)}
-                            </h3>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
-                              <span>{day.activities.length} atividades</span>
-                              <span>•</span>
-                              <span>
-                                Compromisso: {day.commitmentLevel || 0}/10
-                              </span>
-                              <Badge
-                                variant="secondary"
-                                className="bg-success/10 text-success border-success/20"
-                              >
-                                Finalizado
-                              </Badge>
-                            </div>
-                          </div>
+                    {/* Botões (edit/excluir) */}
+                    <div className="absolute top-4 right-4 flex gap-2 z-10">
+                      <Button
+                        size="icon"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation(); // 👉 impede abrir rota ao clicar
+                          navigate(`/edit-day/${day.id}`);
+                        }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
 
-                          {/* Botões */}
-                          <div className="flex gap-2">
+                      <Button
+                        size="icon"
+                        variant="destructive"
+                        onClick={(e) => {
+                          e.stopPropagation(); // 👉 impede abrir rota ao clicar
+                          setConfirmDayId(day.id);
+                        }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+
+                    {/* Modal de confirmação */}
+                    {confirmDayId === day.id && (
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50">
+                        <Card className="w-80 p-6">
+                          <p className="text-center mb-4">
+                            Tem certeza que deseja excluir este dia e todas as
+                            atividades?
+                          </p>
+                          <div className="flex justify-between gap-2">
                             <Button
-                              size="icon"
                               variant="outline"
-                              onClick={() => navigate(`/edit-day/${day.id}`)}
+                              onClick={() => setConfirmDayId(null)}
                             >
-                              <Edit className="w-4 h-4" />
+                              Cancelar
                             </Button>
-
                             <Button
-                              size="icon"
                               variant="destructive"
-                              onClick={() => setConfirmDayId(day.id)}
+                              onClick={handleConfirmRemove}
                             >
-                              <Trash2 className="w-4 h-4" />
+                              Excluir
                             </Button>
                           </div>
-                        </div>
-
-                        {/* Lista de atividades */}
-                        <div className="max-h-60 overflow-hidden relative">
-                          <div className="grid gap-3">
-                            {day.activities
-                              .sort((a, b) =>
-                                a.startTime.localeCompare(b.startTime)
-                              )
-                              .slice(0, 4)
-                              .map((activity) => (
-                                <div
-                                  key={activity.id}
-                                  className="p-3 bg-muted/30 rounded-lg"
-                                >
-                                  <p className="font-medium text-sm">
-                                    {activity.startTime} - {activity.endTime}
-                                  </p>
-                                  <p className="text-sm">
-                                    {activity.description}
-                                  </p>
-                                  <div className="flex gap-1 mt-1 flex-wrap">
-                                    {activity.tags.map((tag) => (
-                                      <Badge
-                                        key={tag.id}
-                                        variant="outline"
-                                        className="text-xs"
-                                        style={{
-                                          borderColor: tag.color + "40",
-                                          color: tag.color,
-                                        }}
-                                      >
-                                        {tag.name}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                </div>
-                              ))}
-                          </div>
-
-                          {/* Botão ver todas */}
-                          {tooMany && (
-                            <div className="mt-4 flex justify-center">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={() => navigate(`/edit-day/${day.id}`)}
-                              >
-                                Ver todas atividades
-                              </Button>
-                            </div>
-                          )}
-                        </div>
-                      </CardContent>
-
-                      {/* Modal de confirmação */}
-                      {confirmDayId === day.id && (
-                        <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-50">
-                          <Card className="w-80 p-6">
-                            <p className="text-center mb-4">
-                              Tem certeza que deseja excluir este dia e todas
-                              as atividades?
-                            </p>
-                            <div className="flex justify-between gap-2">
-                              <Button
-                                variant="outline"
-                                onClick={() => setConfirmDayId(null)}
-                              >
-                                Cancelar
-                              </Button>
-                              <Button
-                                variant="destructive"
-                                onClick={handleConfirmRemove}
-                              >
-                                Excluir
-                              </Button>
-                            </div>
-                          </Card>
-                        </div>
-                      )}
-                    </Card>
-                  );
-                })}
+                        </Card>
+                      </div>
+                    )}
+                  </div>
+                ))}
             </div>
           )}
         </>

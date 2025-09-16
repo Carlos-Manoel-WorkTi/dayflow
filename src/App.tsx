@@ -17,6 +17,7 @@ import { NotificationsPage } from "./pages/NotificationsPage";
 import { InsightsPage } from "./pages/InsightsPage";
 import { SettingsPage } from "./pages/SettingsPage";
 import { ProfilePage } from "./pages/ProfilePage";
+import ViewDayProcess from "./pages/ViewDayProcess";
 
 
 const queryClient = new QueryClient();
@@ -32,6 +33,7 @@ const App = () => (
             {/* Agrupa todas as páginas dentro do MainLayout */}
             <Route element={<MainLayout />}>
               <Route path="/" element={<Index />} />
+              <Route path="/view-day/:id" element={<ViewDayProcess />} />
               <Route path="/day-process" element={<DayProcess />} />
               <Route path="/edit-day/:id" element={<EditDayProcess />} />
               <Route path="/agenda" element={<AgendaPage />} />

@@ -10,6 +10,7 @@ import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
 import { useNavigate } from "react-router-dom";
 import { InsightsButton } from "@/components/InsightsButton";
+import { CompletedDayCard } from "@/components/DayProcess/CompletedDayCard";
 
 
 const Index = () => {
@@ -101,68 +102,69 @@ console.log("dayProcesses:", dayProcesses);
       </motion.header>
 
       <div className="container mx-auto px-4 py-8">
+        
         <div className="max-w-6xl mx-auto">
-{pendingActivities.length > 0 && (
-  <motion.div
-    initial={{ opacity: 0, y: -20 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.3 }}
-    className="mb-6 cursor-pointer"
-    onClick={() => navigate("/day-process")}
-  >
-    <Card className="border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 transition-all duration-200">
-      <CardContent className="p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h3 className="font-semibold text-lg text-blue-700">Atividades Pendentes</h3>
-            <p className="text-sm text-blue-600">
-              Última atualização: {activeDay?.updatedAt ? new Date(activeDay.updatedAt).toLocaleTimeString('pt-BR') : '-'}
-            </p>
-          </div>
-          <Badge
-            variant="secondary"
-            className="bg-blue-100 text-blue-800 border-blue-200"
-          >
-            Pendente
-          </Badge>
-        </div>
-
-        <div className="grid gap-3">
-          {pendingActivities.map((activity) => (
-            <div
-              key={activity.id}
-              className="flex items-center justify-between p-3 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors duration-200"
+          {pendingActivities.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+              className="mb-6 cursor-pointer"
+              onClick={() => navigate("/day-process")}
             >
-              <div className="flex items-center gap-3">
-                <div className="text-sm font-mono text-blue-700">
-                  {activity.startTime} - {activity.endTime}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium">{activity.description}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-1">
-                {activity.tags.map((tag) => (
-                  <Badge
-                    key={tag.id}
-                    variant="outline"
-                    className="text-xs"
-                    style={{
-                      borderColor: tag.color + "40",
-                      color: tag.color,
-                    }}
-                  >
-                    {tag.name}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
-  </motion.div>
-)}
+              <Card className="border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 transition-all duration-200">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-semibold text-lg text-blue-700">Atividades Pendentes</h3>
+                      <p className="text-sm text-blue-600">
+                        Última atualização: {activeDay?.updatedAt ? new Date(activeDay.updatedAt).toLocaleTimeString('pt-BR') : '-'}
+                      </p>
+                    </div>
+                    <Badge
+                      variant="secondary"
+                      className="bg-blue-100 text-blue-800 border-blue-200"
+                    >
+                      Pendente
+                    </Badge>
+                  </div>
+
+                  <div className="grid gap-3">
+                    {pendingActivities.map((activity) => (
+                      <div
+                        key={activity.id}
+                        className="flex items-center justify-between p-3 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors duration-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="text-sm font-mono text-blue-700">
+                            {activity.startTime} - {activity.endTime}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{activity.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {activity.tags.map((tag) => (
+                            <Badge
+                              key={tag.id}
+                              variant="outline"
+                              className="text-xs"
+                              style={{
+                                borderColor: tag.color + "40",
+                                color: tag.color,
+                              }}
+                            >
+                              {tag.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
 
 
           {/* Gráfico de Compromisso */}
@@ -213,74 +215,14 @@ console.log("dayProcesses:", dayProcesses);
                 </CardContent>
               </Card>
             ) : (
-                <div className="grid gap-4">
-                  {completedDays
-                    .sort((a, b) => b.date.localeCompare(a.date))
-                    .map((day) => (
-                      <motion.div
-                        key={day.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        className="group"
-                      >
-                        <Card className="hover:shadow-md transition-all duration-200 border border-primary/10">
-                          <CardContent className="p-6">
-                            <div className="flex items-center justify-between mb-4">
-                              <div>
-                                <h3 className="font-semibold text-lg">
-                                  {formatDate(day.date)}
-                                </h3>
-                                <p className="text-sm text-muted-foreground">
-                                  {day.activities.length} atividades • Nível de compromisso: {day.commitmentLevel || 0}/10
-                                </p>
-                              </div>
-                              <Badge 
-                                variant="secondary"
-                                className="bg-success/10 text-success border-success/20"
-                              >
-                                Finalizado
-                              </Badge>
-                            </div>
+               <div className="grid gap-4">
+  {completedDays
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .map((day) => (
+      <CompletedDayCard key={day.id} day={day} formatDate={formatDate} />
+    ))}
+</div>
 
-                            <div className="grid gap-3">
-                              {day.activities
-                                .sort((a, b) => a.startTime.localeCompare(b.startTime))
-                                .map((activity) => (
-                                  <div
-                                    key={activity.id}
-                                    className="flex items-center justify-between p-3 bg-muted/30 rounded-lg"
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <div className="text-sm font-mono text-muted-foreground">
-                                        {activity.startTime} - {activity.endTime}
-                                      </div>
-                                      <div className="flex-1">
-                                        <p className="text-sm font-medium">{activity.description}</p>
-                                      </div>
-                                    </div>
-                                    <div className="flex items-center gap-1">
-                                      {activity.tags.map((tag) => (
-                                        <Badge
-                                          key={tag.id}
-                                          variant="outline"
-                                          className="text-xs"
-                                          style={{
-                                            borderColor: tag.color + "40",
-                                            color: tag.color,
-                                          }}
-                                        >
-                                          {tag.name}
-                                        </Badge>
-                                      ))}
-                                    </div>
-                                  </div>
-                                ))}
-                            </div>
-                          </CardContent>
-                        </Card>
-                      </motion.div>
-                    ))}
-                </div>
             )}
           </motion.div>
 
