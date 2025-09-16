@@ -10,8 +10,25 @@ import Loader from "@/components/loader/Loading";
 import { DayProcess } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 
+// Recharts
+import {
+  PieChart,
+  Pie,
+  Tooltip,
+  Legend,
+  Cell,
+  ResponsiveContainer,
+  RadarChart,
+  Radar,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+} from "recharts";
+
+const colors = ["#8884d8", "#82ca9d", "#ffc658", "#ff8042", "#0088fe"];
+
 const ViewDayProcess = () => {
-  const { id } = useParams<{ id: string }>(); // id do dia
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
   const { dayProcesses, removeDay } = useDayFlow();
@@ -42,7 +59,6 @@ const ViewDayProcess = () => {
     setAiLoading(true);
     setAiResult(null);
 
-    // Simulação de análise IA (aqui você pode chamar sua API real)
     setTimeout(() => {
       setAiResult(
         `📊 Análise do dia ${day.date}: Você concluiu ${day.activities.length} atividades. 
@@ -50,7 +66,7 @@ const ViewDayProcess = () => {
         Sugestão: manter consistência e equilibrar tempo de descanso.`
       );
       setAiLoading(false);
-    }, 1500);
+    }, 1200);
   };
 
   if (loading || !day) {
@@ -70,6 +86,23 @@ const ViewDayProcess = () => {
     return acc + (end - start);
   }, 0);
 
+  // Data para PieChart (tempo por atividade)
+  const pieData = day.activities.map((act, i) => {
+    const [sh, sm] = act.startTime.split(":").map(Number);
+    const [eh, em] = act.endTime.split(":").map(Number);
+    const start = sh * 60 + sm;
+    const end = eh * 60 + em;
+    const duration = (end - start) / 60; // em horas
+    return { name: act.description, value: duration };
+  });
+
+  // Data para RadarChart (resumo)
+  const radarData = [
+    { subject: "Atividades", A: day.activities.length, fullMark: 10 },
+    { subject: "Compromisso", A: day.commitmentLevel || 0, fullMark: 10 },
+    { subject: "Tempo (h)", A: Math.floor(totalTime / 60), fullMark: 24 },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -79,36 +112,31 @@ const ViewDayProcess = () => {
         className="bg-card border-b sticky top-0 z-50 backdrop-blur-sm"
       >
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3">
             <Link to="/completed-days">
-              <Button variant="ghost" size="icon" className="sm:size-sm">
+              <Button variant="ghost" size="icon">
                 <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline ml-2">Voltar</span>
               </Button>
             </Link>
             <div className="flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
-              <h1 className="text-lg sm:text-xl font-bold">
-                Visualizar Dia {day.date}
-              </h1>
+              <h1 className="text-lg font-bold">Visualizar Dia {day.date}</h1>
             </div>
           </div>
         </div>
       </motion.header>
 
       {/* Conteúdo */}
-      <div className="container mx-auto px-4 py-8 pb-24 md:pb-6 max-w-4xl">
-        {/* Estatísticas */}
-        <Card className="mb-6 border-2 border-primary/20 gradient-card">
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        {/* Resumo */}
+        <Card className="mb-6 border-2 border-primary/20">
           <CardContent className="p-6 flex justify-between items-center">
             <div>
-              <h2 className="text-xl font-bold text-primary mb-1">
-                Resumo do Dia
-              </h2>
+              <h2 className="text-xl font-bold text-primary mb-1">Resumo do Dia</h2>
               <p className="text-muted-foreground">
                 {day.activities.length} atividades • Compromisso{" "}
-                {day.commitmentLevel || 0}/10 • Tempo total: {Math.floor(totalTime / 60)}h{" "}
-                {totalTime % 60}m
+                {day.commitmentLevel || 0}/10 • Tempo total:{" "}
+                {Math.floor(totalTime / 60)}h {totalTime % 60}m
               </p>
             </div>
             <div className="flex gap-2">
@@ -128,22 +156,67 @@ const ViewDayProcess = () => {
 
         {/* Botão IA */}
         <div className="flex justify-center mb-6">
-          <Button
-            onClick={handleAnalyzeWithAI}
-            className="flex items-center gap-2"
-            disabled={aiLoading}
-          >
-            <Bot className="w-4 h-4" />
+          <Button onClick={handleAnalyzeWithAI} disabled={aiLoading}>
+            <Bot className="w-4 h-4 mr-2" />
             {aiLoading ? "Analisando..." : "Analisar com IA"}
           </Button>
         </div>
 
-        {/* Resultado IA */}
+        {/* Resposta IA */}
         {aiResult && (
           <Card className="mb-6">
             <CardContent className="p-6 whitespace-pre-line">{aiResult}</CardContent>
           </Card>
         )}
+
+     {/* Gráficos */}
+<div className="flex flex-wrap gap-6 justify-center mb-6 w-full max-w-7xl mx-auto">
+  <Card className="flex-1 min-w-[280px]">
+    <CardContent className="p-4 h-[320px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <PieChart>
+          <Pie
+            data={pieData}
+            cx="50%"
+            cy="50%"
+            innerRadius={50}
+            outerRadius="80%"
+            paddingAngle={4}
+            dataKey="value"
+          >
+            {pieData.map((_, i) => (
+              <Cell key={i} fill={colors[i % colors.length]} />
+            ))}
+          </Pie>
+          <Tooltip />
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
+
+  <Card className="flex-1 min-w-[280px]">
+    <CardContent className="p-4 h-[320px]">
+      <ResponsiveContainer width="100%" height="100%">
+        <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+          <PolarGrid />
+          <PolarAngleAxis dataKey="subject" />
+          <PolarRadiusAxis />
+          <Radar
+            name="Você"
+            dataKey="A"
+            stroke="#8884d8"
+            fill="#8884d8"
+            fillOpacity={0.6}
+          />
+          <Tooltip />
+          <Legend />
+        </RadarChart>
+      </ResponsiveContainer>
+    </CardContent>
+  </Card>
+</div>
+
 
         {/* Lista de atividades */}
         <Card>

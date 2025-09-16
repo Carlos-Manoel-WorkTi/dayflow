@@ -216,12 +216,12 @@ console.log("dayProcesses:", dayProcesses);
               </Card>
             ) : (
                <div className="grid gap-4">
-  {completedDays
-    .sort((a, b) => b.date.localeCompare(a.date))
-    .map((day) => (
-      <CompletedDayCard key={day.id} day={day} formatDate={formatDate} />
-    ))}
-</div>
+                  {completedDays
+                    .sort((a, b) => b.date.localeCompare(a.date))
+                    .map((day) => (
+                      <CompletedDayCard key={day.id} day={day} formatDate={formatDate} />
+                    ))}
+                </div>
 
             )}
           </motion.div>
