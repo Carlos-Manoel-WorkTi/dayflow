@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { LogIn, LogInIcon } from "lucide-react"; // ícone do Google
+import { LogIn } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
+import { FaFacebook } from "react-icons/fa";
 import { Button } from "@/components/ui/button";
 
 interface LoginScreenProps {
   onEmailLogin: (email: string, name: string) => void;
   onGoogleLogin: () => void;
+  onFacebookLogin?: () => void;
 }
 
-export function LoginScreen({ onEmailLogin, onGoogleLogin }: LoginScreenProps) {
+export function LoginScreen({ onEmailLogin, onGoogleLogin, onFacebookLogin }: LoginScreenProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
 
@@ -31,6 +34,7 @@ export function LoginScreen({ onEmailLogin, onGoogleLogin }: LoginScreenProps) {
           Bem-vindo ao <span className="text-purple-600">DayFlow</span>
         </h2>
 
+        {/* Inputs */}
         <input
           type="text"
           placeholder="Seu nome"
@@ -38,7 +42,6 @@ export function LoginScreen({ onEmailLogin, onGoogleLogin }: LoginScreenProps) {
           onChange={(e) => setName(e.target.value)}
           className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400 focus:outline-none transition"
         />
-
         <input
           type="email"
           placeholder="Seu email"
@@ -47,26 +50,41 @@ export function LoginScreen({ onEmailLogin, onGoogleLogin }: LoginScreenProps) {
           className="w-full p-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-purple-400 focus:outline-none transition"
         />
 
+        {/* Botão Email */}
         <motion.button
           type="submit"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
-          className="w-full p-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold shadow-lg"
+          className="w-full p-3 rounded-xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold shadow-lg flex items-center justify-center gap-2"
         >
-          <LogIn className="inline w-5 h-5 mr-2" /> Entrar com Email
+          <LogIn className="w-5 h-5" /> Entrar com Email
         </motion.button>
 
-        <div className="text-center text-gray-400 mt-2">ou</div>
+        <div className="text-center text-gray-400 mt-2">ou entre com</div>
 
+        {/* Botão Google */}
         <motion.button
           type="button"
           onClick={onGoogleLogin}
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
-          className="w-full p-3 rounded-xl border border-gray-300 flex items-center justify-center gap-2 font-medium shadow-sm hover:shadow-md transition mt-2"
+          className="w-full p-3 rounded-xl border border-gray-300 flex items-center justify-center gap-3 font-medium shadow-sm hover:shadow-md transition"
         >
-          <LogInIcon className="w-5 h-5 text-red-500" /> Entrar com Google
+          <FcGoogle className="w-6 h-6" /> Google
         </motion.button>
+
+        {/* Botão Facebook */}
+        {onFacebookLogin && (
+          <motion.button
+            type="button"
+            onClick={onFacebookLogin}
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="w-full p-3 rounded-xl bg-blue-600 text-white flex items-center justify-center gap-3 font-medium shadow-md hover:shadow-lg transition"
+          >
+            <FaFacebook className="w-6 h-6" /> Facebook
+          </motion.button>
+        )}
       </motion.form>
     </div>
   );

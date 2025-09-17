@@ -61,3 +61,4 @@ export interface CalendarEvent {
   date: string; // formato "yyyy-MM-dd"
   activitiesCount: number;
 }
+

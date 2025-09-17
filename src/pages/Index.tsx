@@ -35,7 +35,7 @@ const navigate = useNavigate();
 
   // Junta todas as atividades desses dias
   const atividadesParaInsights = lastDays.flatMap(day => day.activities);
-  console.log("atividadesParaInsights:", atividadesParaInsights);
+
   
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('pt-BR', {
@@ -45,7 +45,7 @@ const navigate = useNavigate();
       day: 'numeric'
     });
   };
-console.log("dayProcesses:", dayProcesses);
+
 
 
 

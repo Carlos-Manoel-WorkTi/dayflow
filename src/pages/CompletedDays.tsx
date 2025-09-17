@@ -25,13 +25,18 @@ const CompletedDays = () => {
     (day) => day.finalizado && day.activities.length > 0
   );
 
-  const formatDate = (dateString: string) =>
-    new Date(dateString).toLocaleDateString("pt-BR", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
+
+  
+const formatDate = (dateString: string) => {
+  const [year, month, day] = dateString.split("-").map(Number);
+  return new Date(year, month - 1, day).toLocaleDateString("pt-BR", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
 
   const handleConfirmRemove = async () => {
     if (confirmDayId) {

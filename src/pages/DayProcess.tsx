@@ -14,6 +14,7 @@ import { ConfirmReopenModal } from "@/components/DayProcess/ConfirmReopenModal";
 import { getTodayDate } from "@/lib/utils";
 
 
+
 const DayProcess = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -225,7 +226,12 @@ const DayProcess = () => {
         onClose={() => setShowReopenModal(false)}
         onConfirm={async () => {
           if (!dayToReopen) return;
-          const reopenedDay = { ...dayToReopen, finalizado: false, isCompleted: false };
+          const reopenedDay: ReopenedDay = {
+            ...dayToReopen,  // mantém id, date, activities, createdAt, updatedAt, etc
+            finalizado: false,
+            isCompleted: false,
+            updatedAt: new Date().toISOString(),
+          };
           await saveDay(reopenedDay); // use a mesma função que já salva no Firestore
           setShowReopenModal(false);
           toast({

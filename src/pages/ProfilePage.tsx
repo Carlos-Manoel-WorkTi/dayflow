@@ -7,12 +7,16 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 
 export const ProfilePage = () => {
-  const { user, getAvatar } = useUser();
+  const { user, getAvatar, clearUser } = useUser();
   const { dayProcesses } = useDayFlow();
   const navigate = useNavigate();
 
   const completedDays = dayProcesses.filter((d) => d.finalizado).length;
   const totalActivities = dayProcesses.reduce((sum, d) => sum + d.activities.length, 0);
+  const Logout = () => {
+    clearUser();
+    navigate("/");
+  }
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 ">
@@ -80,12 +84,12 @@ export const ProfilePage = () => {
           <Button
             variant="destructive"
             className="w-full flex items-center justify-center gap-2"
-            onClick={() => alert("Logout")}
+            onClick={Logout}
           >
             Sair
           </Button>
         </section>
-      </main>
+      </main> 
     </div>
   );
 };
