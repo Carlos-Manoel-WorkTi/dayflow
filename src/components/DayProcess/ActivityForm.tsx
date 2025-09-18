@@ -1,6 +1,6 @@
   import { useState, useEffect } from "react";
   import { motion, AnimatePresence } from "framer-motion";
-  import { Clock, Plus, X, Tag as TagIcon } from "lucide-react";
+  import { Clock, Plus, X, Tag as TagIcon, HelpCircle } from "lucide-react";
   import { Button } from "@/components/ui/button";
   import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
   import { Input } from "@/components/ui/input";
@@ -9,6 +9,7 @@
   import { Badge } from "@/components/ui/badge";
   import { Activity, Tag } from "@/types";
   import { useToast } from "@/hooks/use-toast";
+import { useSpellCheck } from "@/hooks/useSpellCheck";
 
   interface ActivityFormProps {
     onAddActivity: (activity: Omit<Activity, "id">) => void;
@@ -25,7 +26,7 @@
     const [newTagName, setNewTagName] = useState("");
     const [showTagInput, setShowTagInput] = useState(false);
     const { toast } = useToast();
-
+    const { autoCorrect } = useSpellCheck();
     // Atualiza o startTime sempre que nextStartTime mudar
     useEffect(() => {
       setStartTime(nextStartTime);
@@ -55,7 +56,7 @@
       onAddActivity({
         startTime,
         endTime,
-        description: description.trim(),
+        description: autoCorrect(description.trim()),
         tags: selectedTags,
       });
 
@@ -85,11 +86,26 @@
     return (
       <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5 }}>
         <Card className="border-2 border-primary/20">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-primary" /> Nova Atividade
-            </CardTitle>
-          </CardHeader>
+       <CardHeader>
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Clock className="w-5 h-5 text-primary" /> 
+              Nova Atividade
+            </div>
+
+           <div className="relative group">
+              <HelpCircle className="w-5 h-5 mb-1 text-muted-foreground cursor-pointer hover:text-primary transition" />
+              <span className="absolute bottom-full mb-2 right-0
+                              hidden group-hover:block px-2 py-1 text-xs rounded bg-gray-700 text-white
+                              z-50 max-w-[200px] w-40 text-left break-words">
+                Aqui você registra suas atividades diárias. Preencha horário, descrição e tags.
+              </span>
+            </div>
+
+          </CardTitle>
+        </CardHeader>
+
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">

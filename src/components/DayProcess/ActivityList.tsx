@@ -56,7 +56,7 @@ export function ActivityList({ activities, onDeleteActivity, onEditActivity }: A
         </CardHeader>
         <CardContent className="space-y-4">
           {activities
-            .sort((a, b) => a.startTime.localeCompare(b.startTime))
+            .sort((a, b) => b.startTime.localeCompare(b.startTime))
             .map((activity, index) => (
               <ActivityItem
                 key={activity.id}

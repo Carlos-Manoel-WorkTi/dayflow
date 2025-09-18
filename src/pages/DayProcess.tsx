@@ -12,6 +12,8 @@ import Loader from "@/components/loader/Loading";
 import DateModal from "@/components/DayProcess/DateModal";
 import { ConfirmReopenModal } from "@/components/DayProcess/ConfirmReopenModal";
 import { getTodayDate } from "@/lib/utils";
+import ProgressStats from "@/components/DayProcess/progressTask";
+import { useStats } from "@/hooks/useStats";
 
 
 
@@ -33,8 +35,11 @@ const DayProcess = () => {
     completeDay,
     getNextStartTime,
     saveDay,
+    dayProcesses
     
   } = useDayFlow();
+  
+  const { dailyGoal } = useStats(dayProcesses, { defaultGoal: 5 });
 
   // Loading de criação de novo dia
   const [loadingNewDay, setLoadingNewDay] = useState(false);
@@ -138,6 +143,7 @@ const DayProcess = () => {
       </div>
 
 
+
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {loadingDay ? (
@@ -168,7 +174,12 @@ const DayProcess = () => {
                     )}
                   </CardContent>
                 </Card>
-
+                {/* Gamificação - barra de progresso */}
+                  <ProgressStats
+                    activities={currentDay?.activities || []}
+                    completed={currentDay?.finalizado || false}
+                    goal={dailyGoal}
+                  />
                 {!currentDay.isCompleted && (
                   <ActivityForm
                     onAddActivity={addActivity}
@@ -185,7 +196,7 @@ const DayProcess = () => {
 
               <div>
                 <ActivityList
-                  activities={currentDay.activities}
+                  activities={[...currentDay.activities].reverse()}
                   onDeleteActivity={removeActivity}
                   onEditActivity={editActivity}
                 />

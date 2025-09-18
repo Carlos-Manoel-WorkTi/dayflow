@@ -11,6 +11,8 @@ import heroImage from "@/assets/hero-dayflow.jpg";
 import { useNavigate } from "react-router-dom";
 import { InsightsButton } from "@/components/InsightsButton";
 import { CompletedDayCard } from "@/components/DayProcess/CompletedDayCard";
+import { useStats } from "@/hooks/useStats";
+import ProgressStats from "@/components/DayProcess/progressTask";
 
 
 const Index = () => {
@@ -19,8 +21,11 @@ const {
   availableTags,
   commitmentData,
   createNewDay,
-  hasActiveDay
+  hasActiveDay,
+  currentDay,
 } = useDayFlow();
+
+const { dailyGoal } = useStats(dayProcesses, { defaultGoal: 5 });
 
 const navigate = useNavigate();
 
@@ -102,16 +107,17 @@ const navigate = useNavigate();
       </motion.header>
 
       <div className="container mx-auto px-4 py-8">
-        
         <div className="max-w-6xl mx-auto">
           {pendingActivities.length > 0 && (
             <motion.div
-              initial={{ opacity: 0, y: -20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-              className="mb-6 cursor-pointer"
-              onClick={() => navigate("/day-process")}
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-6 cursor-pointer flex flex-col gap-4"
+            onClick={() => navigate("/day-process")}
             >
+              <ProgressStats activities={currentDay?.activities || []} completed={currentDay?.finalizado || false} goal={dailyGoal}/>
+
               <Card className="border-2 border-blue-300 bg-blue-50 hover:bg-blue-100 transition-all duration-200">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between mb-4">

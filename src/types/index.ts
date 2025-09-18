@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction } from "react";
+
 export interface Tag {
   id: string;
   name: string;
@@ -62,3 +64,13 @@ export interface CalendarEvent {
   activitiesCount: number;
 }
 
+
+export interface ProgressStatsProps {
+  activities: any[];
+  completed: boolean;
+  goal: number; // 👈 nova prop
+}
+export interface NavBarProps {
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+}

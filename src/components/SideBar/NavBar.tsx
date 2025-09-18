@@ -18,6 +18,7 @@ import { useUser } from "@/contexts/UserContext";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import logoImg from "@/assets/logo.png";
+import { NavBarProps } from "@/types";
 
 export const menuItems = [
   { label: "Início", icon: Home, path: "/" },
@@ -32,7 +33,7 @@ export const menuItems = [
   { label: "Documentação", icon: BookOpen, path: "/docs" },
 ];
 
-export function NavBar() {
+export function NavBar({ open, setOpen }: NavBarProps) {
   const { user, getAvatar, clearUser } = useUser();
   const location = useLocation();
   const navigate = useNavigate();
