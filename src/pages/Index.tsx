@@ -1,18 +1,15 @@
 import { motion } from "framer-motion";
 import { Sparkles, Save, Plus, Calendar, TrendingUp } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { CommitmentChart } from "@/components/Charts/CommitmentChart";
 import { Navigation } from "@/components/Navigation";
 import { useDayFlow } from "@/hooks/useDayFlow";
-import { Link } from "react-router-dom";
 import heroImage from "@/assets/hero-dayflow.jpg";
 import { useNavigate } from "react-router-dom";
-import { InsightsButton } from "@/components/InsightsButton";
-import { CompletedDayCard } from "@/components/DayProcess/CompletedDayCard";
 import { useStats } from "@/hooks/useStats";
 import ProgressStats from "@/components/DayProcess/progressTask";
+import { useWidgets } from "@/components/Sortable/useWidgets";
+import { SortableContainer } from "@/components/Sortable/SortebleContainer";
 
 
 const Index = () => {
@@ -51,7 +48,12 @@ const navigate = useNavigate();
     });
   };
 
-
+  const { widgets, setWidgets } = useWidgets({
+    completedDays,
+    commitmentData,
+    atividadesParaInsights,
+    formatDate,
+  });
 
 
   return (
@@ -172,65 +174,10 @@ const navigate = useNavigate();
             </motion.div>
           )}
 
-
-          {/* Gráfico de Compromisso */}
+          {/* Container de widgets arrastáveis */}
           <div className="mb-8">
-            <CommitmentChart data={commitmentData} />
+            <SortableContainer items={widgets} setItems={setWidgets} />
           </div>
-
-          {/* Botão de Insights da IA */}
-
-        <InsightsButton atividades={atividadesParaInsights} />
-
-
-          
-
-          {/* Histórico de Dias Finalizados */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="mb-8"
-          >
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold flex items-center gap-2">
-                <Calendar className="w-6 h-6 text-primary" />
-                Histórico de Atividades
-              </h2>
-              <Badge variant="secondary" className="text-sm">
-                {completedDays.length} dias finalizados
-              </Badge>
-            </div>
-
-            {completedDays.length === 0 ? (
-              <Card className="border-2 border-dashed border-muted-foreground/30">
-                <CardContent className="p-12 text-center">
-                  <TrendingUp className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
-                  <h3 className="text-lg font-medium mb-2 text-muted-foreground">
-                    Nenhum dia finalizado ainda
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    Complete seu primeiro processo do dia para ver o histórico aqui.
-                  </p>
-                  <Link to="/day-process">
-                    <Button>
-                      <Plus className="w-4 h-4 mr-2" />
-                      Iniciar Primeiro Dia
-                    </Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ) : (
-               <div className="grid gap-4">
-                  {completedDays
-                    .sort((a, b) => b.date.localeCompare(a.date))
-                    .map((day) => (
-                      <CompletedDayCard key={day.id} day={day} formatDate={formatDate} />
-                    ))}
-                </div>
-
-            )}
-          </motion.div>
 
           {/* Status do Sistema */}
           <motion.div

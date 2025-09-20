@@ -40,7 +40,8 @@ export function CompletedDayCard({ day, formatDate }: CompletedDayCardProps) {
       className="group cursor-pointer"
       onClick={() => navigate(`/view-day/${day.id}`)}
     >
-      <Card className="relative hover:shadow-md transition-all duration-200 border border-primary/10 overflow-hidden">
+      <Card className="w-full relative hover:shadow-md transition-all duration-200 border border-primary/10 overflow-hidden">
+
         {/* Faixa lateral verde */}
         <div className="absolute left-0 top-0 w-1.5 h-full bg-green-500" />
 

@@ -117,14 +117,14 @@ const DayProcess = () => {
           <div className="flex items-center gap-3 sm:gap-4">
             {/* Botão voltar */}
             <Link to="/">
-              <Button variant="ghost" size="icon" className="sm:size-sm">
+              <Button variant="ghost" size="icon" className="sm:size-sm ">
                 <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline ml-2">Voltar</span>
+                <span className="hidden md:inline ">Voltar</span>
               </Button>
             </Link>
 
             {/* Título */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 md:pl-6">
               <Calendar className="w-5 h-5 text-primary" />
               <h1 className="text-lg sm:text-xl font-bold">Processo do Dia</h1>
             </div>
@@ -141,7 +141,6 @@ const DayProcess = () => {
       <div className="sm:hidden text-center py-2 text-sm text-muted-foreground">
         {getTodayDate()}
       </div>
-
 
 
       <div className="container mx-auto px-4 py-8">

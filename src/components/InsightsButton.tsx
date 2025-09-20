@@ -28,16 +28,8 @@ export function InsightsButton({ atividades }: { atividades: any[] }) {
     }
 
     setLoading(true);
-    setOpenModal(true); // 👈 abre já com loading
+    setOpenModal(true);
 
-    // const resumo = atividades
-    //   .map(
-    //     (a) => `- ${a.titulo || a.nome || "Atividade"} (${a.horario || "sem horário"})`
-    //   )
-    //   .join("\n");
-    //   console.log("Resumo das atividades:", resumo);
-      console.log("Atividades para insights:", atividades);
-      
     try {
       const resposta = await getInsights({
         system: resumoPrompts.diario,
@@ -61,7 +53,7 @@ export function InsightsButton({ atividades }: { atividades: any[] }) {
   };
 
   return (
-    <div className="mb-8 text-center">
+    <div className="w-full text-center">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,42 +72,44 @@ export function InsightsButton({ atividades }: { atividades: any[] }) {
 
       <Dialog open={openModal} onOpenChange={setOpenModal}>
         <DialogContent className="max-w-3xl rounded-2xl shadow-xl bg-white max-h-[90vh] flex flex-col">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-primary">
-              ✨ Insights do Dia
-            </DialogTitle>
-          </DialogHeader>
+          <div className="flex flex-col flex-1">
+            <div className="p-4 border-b">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-bold text-primary">
+                  ✨ Insights do Dia
+                </DialogTitle>
+              </DialogHeader>
+            </div>
 
-          {/* 🔥 área rolável */}
-          <div className="mt-4 text-left flex-1 overflow-y-auto pr-2">
-            {loading ? (
-              <p className="text-gray-400 animate-pulse">⏳ Gerando insights...</p>
-            ) : insight ? (
-              <div className="prose prose-sm max-w-none text-gray-800">
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
-                  rehypePlugins={[rehypeHighlight]}
-                >
-                  {insight}
-                </ReactMarkdown>
-              </div>
-            ) : (
-              <p className="text-gray-400">Nenhum insight disponível.</p>
-            )}
-          </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {loading ? (
+                <p className="text-gray-400 animate-pulse">⏳ Gerando insights...</p>
+              ) : insight ? (
+                <div className="prose prose-sm max-w-none text-gray-800">
+                  <ReactMarkdown
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                  >
+                    {insight}
+                  </ReactMarkdown>
+                </div>
+              ) : (
+                <p className="text-gray-400">Nenhum insight disponível.</p>
+              )}
+            </div>
 
-          {/* Footer com os botões */}
-          <div className="mt-6 flex justify-end gap-2">
-            {insight && (
-              <Button variant="secondary" onClick={copyToClipboard}>
-                <Copy size={16} className="mr-1" />
-                {copied ? "Copiado!" : "Copiar"}
+            <div className="flex justify-end gap-2 p-4 border-t">
+              {insight && (
+                <Button variant="secondary" onClick={copyToClipboard}>
+                  <Copy size={16} className="mr-1" />
+                  {copied ? "Copiado!" : "Copiar"}
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => setOpenModal(false)}>
+                <X size={16} className="mr-1" />
+                Fechar
               </Button>
-            )}
-            <Button variant="outline" onClick={() => setOpenModal(false)}>
-              <X size={16} className="mr-1" />
-              Fechar
-            </Button>
+            </div>
           </div>
         </DialogContent>
       </Dialog>
