@@ -1,73 +1,69 @@
-# Welcome to your Lovable project
+# 🌊 Dayflow
 
-## Project info
+**Dayflow** é uma aplicação web interativa construída com **React, TypeScript, Vite, Tailwind CSS e shadcn-ui**, ideal para organizar e visualizar insights de forma fluida e moderna.  
+Este projeto serve como demonstração prática de habilidades em frontend, organização de código e criação de interfaces responsivas com foco em experiência do usuário.
 
-**URL**: https://lovable.dev/projects/ad7af953-45c5-44a6-8f22-1b3d01099533
+---
 
-## How can I edit this code?
+## 🧠 Sobre o projeto
 
-There are several ways of editing your application.
+O **Dayflow** foi criado como um projeto frontend completo para aprender e aplicar:
 
-**Use Lovable**
+- Componentes reutilizáveis com React
+- Tipagem com TypeScript
+- Estilização com Tailwind CSS
+- Estrutura moderna usando Vite para desempenho
+- UI acessível com shadcn-ui
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/ad7af953-45c5-44a6-8f22-1b3d01099533) and start prompting.
+Mesmo sem backend, o foco está em **interface, usabilidade e lógica frontend**, formando um painel visual atrativo e dinâmico.
 
-Changes made via Lovable will be committed automatically to this repo.
+---
 
-**Use your preferred IDE**
+## 🧰 Tecnologias utilizadas
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- ⭐ **React**  
+- 📦 **TypeScript**  
+- ⚡ **Vite**  
+- 🎨 **Tailwind CSS**  
+- 🧩 **shadcn-ui**  
+- 📁 Estrutura modular de componentes  
+- 💻 HTML5 e CSS moderno  
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+---
 
-Follow these steps:
+## 🚀 Como executar o projeto
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Clonar o repositório
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+    git clone https://github.com/Carlos-Manoel-WorkTi/dayflow.git
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Entrar na pasta do projeto
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+    cd dayflow
 
-**Edit a file directly in GitHub**
+### Instalar as dependências
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+    npm install
 
-**Use GitHub Codespaces**
+### Iniciar o servidor de desenvolvimento
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+    npm run dev
 
-## What technologies are used for this project?
+Abra no navegador:  
+http://localhost:3000
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 📂 Estrutura do projeto
 
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/ad7af953-45c5-44a6-8f22-1b3d01099533) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+```text
+dayflow/
+├─ public/                  # Arquivos estáticos públicos
+├─ src/
+│   ├─ components/          # Componentes UI
+│   ├─ pages/               # Páginas da aplicação
+│   └─ styles/              # Estilos e temas
+├─ package.json
+├─ tsconfig.json
+├─ vite.config.ts
+└─ tailwind.config.ts
